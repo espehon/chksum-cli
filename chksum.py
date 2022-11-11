@@ -3,11 +3,11 @@
 helpMsg = """
 CHKSUM
 """
-#region --------------------------------[ Imports ]--------------------------------
+#region: --------------------------------[ Imports ]--------------------------------
 import checksum
 
 
-#endregion Imports
+#endregion: Imports
 
 
 
