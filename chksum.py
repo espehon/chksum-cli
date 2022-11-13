@@ -56,7 +56,9 @@ parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
 
 # get args from input
+
 args = parser.parse_args()
+
 
 
 #endregion: Variables
@@ -98,7 +100,7 @@ def processPositional(value: str):
     if not trySetAlgorithm(value):
         if not trySetFile(value):
             if not trySetDir(value):
-                hashes.append(value)
+                hashes.append(str.lower(value)) # checksum returns lowercase
 
 
 def getHash(path: str,  dir: bool=False) -> str:
@@ -108,7 +110,49 @@ def getHash(path: str,  dir: bool=False) -> str:
         return checksum.get_for_file(path, hash_mode=method)
 
 
+def compareHashes():
+    # compare two strings and highlight differences on output
+    # then output True | False
 
+    if len(hashes) == 2:
+        print(str.upper(method))
+        print('-' * 64)
+
+        outputRow_1 = ""
+        outputRow_2 = ""
+        largerRow = None
+        offset = None
+        
+        match [len(hashes[0]), len(hashes[1])]:
+            case [a, b] if a == b:
+                pass
+            case [a, b] if a > b:
+                offset = len(hashes[0]) - len(hashes[1])
+                largerRow = 1
+            case [a, b] if a < b:
+                offset = len(hashes[1]) - len(hashes[0])
+        
+        for (a, b) in zip(hashes[0], hashes[1]):
+            if a == b:
+                outputRow_1 += Fore.GREEN + a
+                outputRow_2 += Fore.GREEN + b
+            else:
+                outputRow_1 += Fore.YELLOW + a
+                outputRow_2 += Fore.YELLOW + b
+        
+        if offset is not None:
+            if largerRow == 1:
+                outputRow_1 += Fore.RED + hashes[0][-offset]
+            else:
+                outputRow_2 += Fore.RED + hashes[1][-offset]
+        
+        print(outputRow_1)
+        print(outputRow_2)
+
+        if hashes[0] == hashes[1]:
+            print(Fore.LIGHTGREEN_EX + "√ Hashes Match")
+        else:
+            print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
 
 
 
