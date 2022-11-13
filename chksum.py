@@ -113,8 +113,7 @@ def getHash(path: str,  dir: bool=False) -> str:
 def compareHashes(hash_1: str, hash_2: str, title: str):
     # compare two strings and highlight differences on output
     # then output True | False
-
-
+    
     print(str.upper("[" + title + "]").center(64, '-'))
 
     outputRow_1 = ""
@@ -159,7 +158,11 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
 
 
 
+
+
 #endregion: Functions
+
+
 
 #region: --------------------------------[ Testing ]--------------------------------
 
