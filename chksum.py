@@ -110,49 +110,48 @@ def getHash(path: str,  dir: bool=False) -> str:
         return checksum.get_for_file(path, hash_mode=method)
 
 
-def compareHashes():
+def compareHashes(hash_1: str, hash_2: str, title: str):
     # compare two strings and highlight differences on output
     # then output True | False
 
-    if len(hashes) == 2:
-        print(str.upper(method))
-        print('-' * 64)
 
-        outputRow_1 = ""
-        outputRow_2 = ""
-        largerRow = None
-        offset = None
-        
-        match [len(hashes[0]), len(hashes[1])]:
-            case [a, b] if a == b:
-                pass
-            case [a, b] if a > b:
-                offset = len(hashes[0]) - len(hashes[1])
-                largerRow = 1
-            case [a, b] if a < b:
-                offset = len(hashes[1]) - len(hashes[0])
-        
-        for (a, b) in zip(hashes[0], hashes[1]):
-            if a == b:
-                outputRow_1 += Fore.GREEN + a
-                outputRow_2 += Fore.GREEN + b
-            else:
-                outputRow_1 += Fore.YELLOW + a
-                outputRow_2 += Fore.YELLOW + b
-        
-        if offset is not None:
-            if largerRow == 1:
-                outputRow_1 += Fore.RED + hashes[0][-offset]
-            else:
-                outputRow_2 += Fore.RED + hashes[1][-offset]
-        
-        print(outputRow_1)
-        print(outputRow_2)
+    print(str.upper("[" + title + "]").center(64, '-'))
 
-        if hashes[0] == hashes[1]:
-            print(Fore.LIGHTGREEN_EX + "√ Hashes Match")
+    outputRow_1 = ""
+    outputRow_2 = ""
+    largerRow = None
+    offset = None
+    
+    match [len(hash_1), len(hash_2)]:
+        case [a, b] if a == b:
+            pass
+        case [a, b] if a > b:
+            offset = len(hash_1) - len(hash_2)
+            largerRow = 1
+        case [a, b] if a < b:
+            offset = len(hash_2) - len(hash_1)
+    
+    for (a, b) in zip(hash_1, hash_2):
+        if a == b:
+            outputRow_1 += Fore.GREEN + a
+            outputRow_2 += Fore.GREEN + b
         else:
-            print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
+            outputRow_1 += Fore.YELLOW + a
+            outputRow_2 += Fore.YELLOW + b
+    
+    if offset is not None:
+        if largerRow == 1:
+            outputRow_1 += Fore.RED + hash_1[-offset:]
+        else:
+            outputRow_2 += Fore.RED + hash_2[-offset:]
+    
+    print(outputRow_1)
+    print(outputRow_2)
+
+    if hash_1 == hash_2:
+        print(Fore.LIGHTGREEN_EX + "√ Hashes Match")
+    else:
+        print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
 
 
 
@@ -161,3 +160,9 @@ def compareHashes():
 
 
 #endregion: Functions
+
+#region: --------------------------------[ Testing ]--------------------------------
+
+
+
+#endregion: Testing
