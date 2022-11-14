@@ -139,6 +139,7 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
 
 
 def main():
+    global method
     processPositional(args.position1, 1)    # store positional accordingly
     processPositional(args.position2, 2)    # store positional accordingly
     try:
@@ -150,18 +151,24 @@ def main():
         print("Missing positional argument...")
         return False
     
-    hashes = []     # stores the final hashes for output
-    iteration = 1   # tracks iteration in the while loop and doubles as a dictionary key
+    hashes = []                 # stores the final hashes for output
+    iteration = 1               # tracks iteration in the while loop and doubles as a dictionary key
+    hashesWerePrepared = True   # is set to False if this script runs the hash. Used to decide output title
 
     while len(hashes) < 2 and iteration <= 3:   # iterate through stored positionals and hash them accordingly
         if iteration in positionals:
             if positionals[iteration]['type'] == 'dir':
                 hashes.append(getHash(positionals[iteration]['value'], dir=True))
+                hashesWerePrepared = False
             elif positionals[iteration]['type'] == 'file':
                 hashes.append(getHash(positionals[iteration]['value']))
+                hashesWerePrepared = False
             elif positionals[iteration]['type'] == 'hash':
                 hashes.append(positionals[iteration]['value'])
         iteration += 1
+    
+    if hashesWerePrepared:
+        method = 'Strings'
 
     compareHashes(hashes[0], hashes[1], method) # test, format, and output hashes
     return True
