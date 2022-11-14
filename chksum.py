@@ -1,25 +1,6 @@
 #python3
 
 
-
-#region: --------------------------------[ Notes ]--------------------------------
-# √   
-
-#endregion: Notes
-
-
-
-
-#region: --------------------------------[ To-Do ]--------------------------------
-# TODO: add ignore .files option
-# TODO: add defaults to description and directory support to description
-
-#endregion: To-Do
-
-
-
-
-
 #region: --------------------------------[ Imports ]--------------------------------
 import os
 import argparse
@@ -36,71 +17,72 @@ init(autoreset=True)
 #region: --------------------------------[ Variables ]--------------------------------
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
-hashes = []
+positionals = {}
 method = 'md5'
 
 parser = argparse.ArgumentParser(
     prog="CHKSUM",
-    description = f"Compare two checksums\nAlgorithms:{ALGORITHMS}",
+    description = f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \nAlgorithms:{ALGORITHMS}",
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog = "If the first 2 positional arguments are checksums, the algorithm is not needed.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF",
+    epilog = "If the first 2 positional arguments are checksums, the algorithm is not needed. Default is md5.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF",
     add_help = False # free -h from help (-? will be used as help flag)
 )
 
-parser.add_argument('-?', '--help', action='help', help="Show this help message and exit.") # make -? help
+parser.add_argument('-?', '--help', action='help', help="Show this help message and exit.")     # make -? help
 parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) files from directories")
 parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
 
-# get args from input
-args = parser.parse_args()
-
-
-
+args = parser.parse_args()      # get args from input
 
 #endregion: Variables
 
 
 
 
+
 #region: --------------------------------[ Functions ]--------------------------------
+def storeDir(value: str, key: int):
+    positionals[key] = {'value': value, 'type': 'dir'}
 
 
+def storeFile(value: str, key: int):
+    positionals[key] = {'value': value, 'type': 'file'}
 
-def trySetAlgorithm(value: str) -> bool:
+
+def storeHash(value: str, key: int):
+    positionals[key] = {'value': value, 'type': 'hash'}
+
+
+def setAlgorithm(value: str):
     global method
-    if str.lower(value) in ALGORITHMS:
-        method = str.lower(value)
-        return True
-    return False
+    method = str.lower(value)
 
 
-def tryHashFile(value: str):
-    if os.path.isfile(value):
-        hashes.append(getHash(value))
-        return True
-    return False
+def hashFile(value: str):
+    positionals.append(getHash(value))
 
 
-def tryHashDir(value: str) -> bool:
-    if os.path.exists(value):
-        hashes.append(getHash(value, dir=True))
-        return True
-    return False
+def hashDir(value: str):
+    positionals.append(getHash(value, dir=True))
 
 
-def processPositional(value: str):
-    """This function will determine what to do with positional arguments (value) that the user passed.
+def processPositional(value: str, key: int):
+    """
+    This function will determine what to do with positional arguments (value) that the user passed.
     It will first check if the value is an algorithm, then if it is a file, then directory.
     The value is considered a hashed value if none of the above.
-    
-    Files and directories hashed and added to the hashes list"""
-    
-    if not trySetAlgorithm(value):
-        if not tryHashFile(value):
-            if not tryHashDir(value):
-                hashes.append(str.lower(value)) # checksum returns lowercase
+    Files and directories hashed in order of positionals[iteration].
+    """
+    if str.lower(value) in ALGORITHMS:
+        setAlgorithm(value)
+    elif os.path.isfile(value):
+        storeFile(value, key)
+    elif os.path.exists(value):
+        storeDir(value, key)
+    else:
+        storeHash(str.lower(value), key) # checksum returns lowercase
 
 
 def getHash(path: str,  dir: bool=False) -> str:
@@ -111,16 +93,17 @@ def getHash(path: str,  dir: bool=False) -> str:
 
 
 def compareHashes(hash_1: str, hash_2: str, title: str):
-    # compare two strings and highlight differences on output
-    # then output True | False
-
-    outputRow_1 = ""
-    outputRow_2 = ""
-    largerRow = None
-    offset = None
-    width = 0
+    """
+    Compare two strings and highlight differences on output.
+    Then output True | False.
+    """
+    outputRow_1 = ""    # first hash to print
+    outputRow_2 = ""    # second hash to print
+    largerRow = None    # keeps track of the larger hash
+    offset = None       # difference in hash sizes
+    width = 0           # for title bar formatting
     
-    match [len(hash_1), len(hash_2)]:
+    match [len(hash_1), len(hash_2)]:   # set logic depending on sizes of hashes for coloring (and to continue where zip stops)
         case [a, b] if a == b:
             width = a
         case [a, b] if a > b:
@@ -131,7 +114,7 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
             offset = b - a
             width = b
     
-    for (a, b) in zip(hash_1, hash_2):
+    for (a, b) in zip(hash_1, hash_2):  # color matching characters green and non matching yellow (orange)
         if a == b:
             outputRow_1 += Fore.GREEN + a
             outputRow_2 += Fore.GREEN + b
@@ -139,53 +122,55 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
             outputRow_1 += Fore.YELLOW + a
             outputRow_2 += Fore.YELLOW + b
     
-    if offset is not None:
+    if offset is not None:  # pickup where zip stopped. Make extra characters red
         if largerRow == 1:
             outputRow_1 += Fore.RED + hash_1[-offset:]
         else:
             outputRow_2 += Fore.RED + hash_2[-offset:]
     
-    print(str.upper("[" + title + "]").center(width, '-'))
+    print(str.upper("[" + title + "]").center(width, '-'))  # output formatted info
     print(outputRow_1)
     print(outputRow_2)
 
-    if hash_1 == hash_2:
+    if hash_1 == hash_2:    # output the final result
         print(Fore.LIGHTGREEN_EX + "√ Hashes Match")
     else:
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
 
+
 def main():
-    processPositional(args.position1)
-    processPositional(args.position2)
+    processPositional(args.position1, 1)    # store positional accordingly
+    processPositional(args.position2, 2)    # store positional accordingly
     try:
-            processPositional(args.position3)
+            processPositional(args.position3, 3)    # store optional 3rd positional
     except:
         pass
 
-    if len(hashes) < 2:
+    if len(positionals) < 2:    # must have at least 2 positionals
         print("Missing positional argument...")
         return False
     
-    compareHashes(hashes[0], hashes[1], method)
+    hashes = []     # stores the final hashes for output
+    iteration = 1   # tracks iteration in the while loop and doubles as a dictionary key
+
+    while len(hashes) < 2 and iteration <= 3:   # iterate through stored positionals and hash them accordingly
+        if iteration in positionals:
+            if positionals[iteration]['type'] == 'dir':
+                hashes.append(getHash(positionals[iteration]['value'], dir=True))
+            elif positionals[iteration]['type'] == 'file':
+                hashes.append(getHash(positionals[iteration]['value']))
+            elif positionals[iteration]['type'] == 'hash':
+                hashes.append(positionals[iteration]['value'])
+        iteration += 1
+
+    compareHashes(hashes[0], hashes[1], method) # test, format, and output hashes
     return True
-
-
-
-
-
-
-
-
 
 #endregion: Functions
 
+
+
+
+
 if __name__ == "__main__":
     main()
-
-
-
-#region: --------------------------------[ Testing ]--------------------------------
-
-
-
-#endregion: Testing
