@@ -36,8 +36,6 @@ init(autoreset=True)
 #region: --------------------------------[ Variables ]--------------------------------
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
-dirs = []
-files = []
 hashes = []
 method = 'md5'
 
@@ -78,16 +76,16 @@ def trySetAlgorithm(value: str) -> bool:
     return False
 
 
-def trySetFile(value: str) -> bool:
+def tryHashFile(value: str):
     if os.path.isfile(value):
-        files.append(value)
+        hashes.append(getHash(value))
         return True
     return False
 
 
-def trySetDir(value: str) -> bool:
+def tryHashDir(value: str) -> bool:
     if os.path.exists(value):
-        dirs.append(value)
+        hashes.append(getHash(value, dir=True))
         return True
     return False
 
@@ -95,11 +93,13 @@ def trySetDir(value: str) -> bool:
 def processPositional(value: str):
     """This function will determine what to do with positional arguments (value) that the user passed.
     It will first check if the value is an algorithm, then if it is a file, then directory.
-    The value is considered a hashed value if none of the above."""
+    The value is considered a hashed value if none of the above.
+    
+    Files and directories hashed and added to the hashes list"""
     
     if not trySetAlgorithm(value):
-        if not trySetFile(value):
-            if not trySetDir(value):
+        if not tryHashFile(value):
+            if not tryHashDir(value):
                 hashes.append(str.lower(value)) # checksum returns lowercase
 
 
@@ -114,21 +114,22 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
     # compare two strings and highlight differences on output
     # then output True | False
 
-    print(str.upper("[" + title + "]").center(64, '-'))
-
     outputRow_1 = ""
     outputRow_2 = ""
     largerRow = None
     offset = None
+    width = 0
     
     match [len(hash_1), len(hash_2)]:
         case [a, b] if a == b:
-            pass
+            width = a
         case [a, b] if a > b:
-            offset = len(hash_1) - len(hash_2)
+            offset = a - b
             largerRow = 1
+            width = a
         case [a, b] if a < b:
-            offset = len(hash_2) - len(hash_1)
+            offset = b - a
+            width = b
     
     for (a, b) in zip(hash_1, hash_2):
         if a == b:
@@ -144,6 +145,7 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
         else:
             outputRow_2 += Fore.RED + hash_2[-offset:]
     
+    print(str.upper("[" + title + "]").center(width, '-'))
     print(outputRow_1)
     print(outputRow_2)
 
@@ -160,15 +162,9 @@ def main():
     except:
         pass
 
-    if len(dirs) + len(files) + len(hashes) < 2:
+    if len(hashes) < 2:
         print("Missing positional argument...")
         return False
-    
-    for path in dirs:
-        hashes.append(getHash(path, dir=True))
-    
-    for path in files:
-        hashes.append(getHash(path))
     
     compareHashes(hashes[0], hashes[1], method)
     return True
@@ -183,8 +179,8 @@ def main():
 
 #endregion: Functions
 
-
-main()
+if __name__ == __main__:
+    main()
 
 
 
