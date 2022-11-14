@@ -17,14 +17,14 @@ init(autoreset=True)
 #region: --------------------------------[ Variables ]--------------------------------
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
-positionals = {}
-method = 'md5'
+positionals = {}    # for storing positionals their type
+method = 'md5'      # default algorithm
 
 parser = argparse.ArgumentParser(
     prog="CHKSUM",
     description = f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \nAlgorithms:{ALGORITHMS}",
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog = "If the first 2 positional arguments are checksums, the algorithm is not needed. Default is md5.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF",
+    epilog = f"If the first 2 positional arguments are checksums, the algorithm is not needed. Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF",
     add_help = False # free -h from help (-? will be used as help flag)
 )
 
