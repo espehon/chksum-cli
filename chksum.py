@@ -56,8 +56,8 @@ parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
 
 # get args from input
-
 args = parser.parse_args()
+
 
 
 
@@ -72,8 +72,8 @@ args = parser.parse_args()
 
 def trySetAlgorithm(value: str) -> bool:
     global method
-    if str.upper(value) in ALGORITHMS:
-        method = value
+    if str.lower(value) in ALGORITHMS:
+        method = str.lower(value)
         return True
     return False
 
@@ -113,7 +113,7 @@ def getHash(path: str,  dir: bool=False) -> str:
 def compareHashes(hash_1: str, hash_2: str, title: str):
     # compare two strings and highlight differences on output
     # then output True | False
-    
+
     print(str.upper("[" + title + "]").center(64, '-'))
 
     outputRow_1 = ""
@@ -152,6 +152,27 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
     else:
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
 
+def main():
+    processPositional(args.position1)
+    processPositional(args.position2)
+    try:
+            processPositional(args.position3)
+    except:
+        pass
+
+    if len(dirs) + len(files) + len(hashes) < 2:
+        print("Missing positional argument...")
+        return False
+    
+    for path in dirs:
+        hashes.append(getHash(path, dir=True))
+    
+    for path in files:
+        hashes.append(getHash(path))
+    
+    compareHashes(hashes[0], hashes[1], method)
+    return True
+
 
 
 
@@ -161,6 +182,9 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
 
 
 #endregion: Functions
+
+
+main()
 
 
 
