@@ -3,7 +3,7 @@
 
 #  This file is used as the entry point for chksum
 
-from chksum import main
+from chksum import cli
 
 if __name__ == "__main__":
-    main()
+    cli()

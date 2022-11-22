@@ -142,10 +142,10 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
 
 
-def main():
+def cli():
     global method
     global args
-    
+
     args = parser.parse_args()  # get args from input
 
     processPositional(args.position1, 1)    # store positional accordingly
