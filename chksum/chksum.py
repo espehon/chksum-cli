@@ -1,4 +1,7 @@
-#python3
+# Copyright (c) 2022, espehon
+# All rights reserved.
+
+
 
 
 #region: --------------------------------[ Imports ]--------------------------------
@@ -15,6 +18,9 @@ init(autoreset=True)
 
 
 #region: --------------------------------[ Variables ]--------------------------------
+
+CHKSUM_LICENSE = """Copyright (c) 2022, espehon\nAll rights reserved."""
+
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
 positionals = {}    # for storing positionals their type
@@ -33,8 +39,6 @@ parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) 
 parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
-
-args = parser.parse_args()      # get args from input
 
 #endregion: Variables
 
@@ -140,6 +144,10 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
 
 def main():
     global method
+    global args
+    
+    args = parser.parse_args()  # get args from input
+
     processPositional(args.position1, 1)    # store positional accordingly
     processPositional(args.position2, 2)    # store positional accordingly
     try:
@@ -180,4 +188,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    print(CHKSUM_LICENSE)
+
