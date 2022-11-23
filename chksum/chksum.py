@@ -181,12 +181,45 @@ def cli():
     compareHashes(hashes[0], hashes[1], method) # test, format, and output hashes
     return True
 
+
+def stand_alone():
+    """
+    This is the standalone version.
+    Logic works as follows:
+        1. Get 1 of 3 options from user
+        2. Determine which option was given
+        3. Ask for 1 of 2 remaining options
+        4. Determine which option was given
+        5. Ask for final option
+        6. Test, format, and output hashes
+        7. Ask to rerun
+    """
+    print(CHKSUM_LICENSE)
+    program_is_running = True
+
+    while program_is_running:
+        try:
+            # TODO
+            print("""\
+      _     _                        
+     | |   | |                       
+  ___| |__ | | _____ _   _ _ __ ___  
+ / __| '_ \| |/ / __| | | | '_ ` _ \ 
+| (__| | | |   <\__ \ |_| | | | | | |
+ \___|_| |_|_|\_\___/\__,_|_| |_| |_|
+""")
+
+
+        except Exception as e:
+            print(e)
+        finally:
+            program_is_running = False
+            user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
+            if user == 'r':
+                program_is_running = True
+                print('\n' * 3)
+
 #endregion: Functions
 
 
-
-
-
-if __name__ == "__main__":
-    print(CHKSUM_LICENSE)
 
