@@ -236,7 +236,7 @@ def stand_alone():
                 else:
                     print("You've already supplied this requirement...")
 
-            for thing, index in enumerate([hash_1, hash_2]):
+            for thing, index in enumerate([hash_1, hash_2]):    # BUG: #4 Directories do not get hashed
                 if os.path.isfile(thing):
                     if index == 0:
                         hash_1 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
@@ -268,7 +268,7 @@ def stand_alone():
             program_is_running = False
             user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
             if user == 'r':
-                # TODO: Entering 'R' doesn't continue the while loop
+                # ISSUE: #3 Entering 'R' doesn't continue the while loop
                 program_is_running = True
                 print('\n' * 3)
 
