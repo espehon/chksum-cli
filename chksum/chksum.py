@@ -28,7 +28,7 @@ method = 'md5'      # default algorithm
 
 parser = argparse.ArgumentParser(
     prog="CHKSUM",
-    description = f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \nAlgorithms:{ALGORITHMS}",
+    description = f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \n{ALGORITHMS = }",
     formatter_class=argparse.RawDescriptionHelpFormatter,
     epilog = f"If the first 2 positional arguments are checksums, the algorithm is not needed. Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF",
     add_help = False # free -h from help (-? will be used as help flag)
@@ -194,28 +194,81 @@ def stand_alone():
         6. Test, format, and output hashes
         7. Ask to rerun
     """
-    print(CHKSUM_LICENSE)
-    program_is_running = True
-
-    while program_is_running:
-        try:
-            # TODO
-            print("""\
+    title = f"""\
       _     _                        
      | |   | |                       
   ___| |__ | | _____ _   _ _ __ ___  
  / __| '_ \| |/ / __| | | | '_ ` _ \ 
 | (__| | | |   <\__ \ |_| | | | | | |
  \___|_| |_|_|\_\___/\__,_|_| |_| |_|
-""")
 
+ {ALGORITHMS = }
+"""
+    print(CHKSUM_LICENSE)
+    user = ""                   # for storing user input
+    program_is_running = True   # for controlling the following while loop
 
+    while program_is_running:
+        try:
+            print(title)
+
+            method = None
+            hash_1 = None
+            hash_2 = None
+
+            ignore_dots = None
+
+            while method is None or hash_1 is None or hash_2 is None:
+                match [method, hash_1, hash_2]:
+                    case [a, b, c] if a is None and (b is None or c is None):
+                        user = input("Enter Algorithm or path to File or Directory > ")
+                    case [a, b, c] if a is not None and (b is None or c is None):
+                        user = input("Enter path to File or Directory > ")
+                    case [a, b, c] if a is None and not (b is None or c is None):
+                        user = input("Enter Algorithm > ")
+
+                if str.lower(user) in ALGORITHMS:
+                    method = str.lower(user)
+                elif hash_1 is None:
+                    hash_1 = user
+                elif hash_2 is None:
+                    hash_2 = user
+                else:
+                    print("You've already supplied this requirement...")
+
+            for thing, index in enumerate([hash_1, hash_2]):
+                if os.path.isfile(thing):
+                    if index == 0:
+                        hash_1 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
+                    else:
+                        hash_2 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
+                elif os.path.exists(thing):
+                    if ignore_dots is None:
+                        ignore_dots = str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")) == 'n'   # anything other than 'N' will set this to False
+                        print(f"{ignore_dots = }")
+                    if index == 0:
+                        hash_1 = checksum.get_for_directory(thing, hash_mode=method, filter_dots=ignore_dots)   # have to call this manually without argparse 
+                    elif hash_2 is None:
+                        hash_2 = checksum.get_for_directory(thing, hash_mode=method, filter_dots=ignore_dots)   # have to call this manually without argparse
+                else:
+                    if index == 0:
+                        hash_1 = str.lower(thing)   # checksum returns lowercase
+                    else:
+                        hash_2 = str.lower(thing)   # checksum returns lowercase
+            
+            # Finally output time!
+            compareHashes(hash_1, hash_2, method) # test, format, and output hashes
+            return True
+
+        except KeyboardInterrupt:
+            print(Fore.YELLOW + "Keyboard Interrupt!")
         except Exception as e:
-            print(e)
+            print(Fore.LIGHTRED_EX + e)
         finally:
             program_is_running = False
             user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
             if user == 'r':
+                # TODO: Entering 'R' doesn't continue the while loop
                 program_is_running = True
                 print('\n' * 3)
 
