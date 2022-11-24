@@ -236,7 +236,10 @@ def stand_alone():
                 else:
                     print("You've already supplied this requirement...")
 
-            for index, thing in enumerate([hash_1, hash_2]):    # BUG: #4 Directories do not get hashed
+            # TODO: #7 user input should be validated on entry, not after all inputs.
+            # the following block should be made a function so that it can be called throughout the previous block
+
+            for index, thing in enumerate([hash_1, hash_2]):
                 if os.path.isfile(thing):
                     if index == 0:
                         hash_1 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
@@ -267,7 +270,6 @@ def stand_alone():
             program_is_running = False
             user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
             if user == 'r':
-                # ISSUE: #3 Entering 'R' doesn't continue the while loop
                 program_is_running = True
                 print('\n' * 3)
 
