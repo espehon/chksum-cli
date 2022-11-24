@@ -236,7 +236,7 @@ def stand_alone():
                 else:
                     print("You've already supplied this requirement...")
 
-            for thing, index in enumerate([hash_1, hash_2]):    # BUG: #4 Directories do not get hashed
+            for index, thing in enumerate([hash_1, hash_2]):    # BUG: #4 Directories do not get hashed
                 if os.path.isfile(thing):
                     if index == 0:
                         hash_1 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
@@ -248,7 +248,7 @@ def stand_alone():
                         print(f"{ignore_dots = }")
                     if index == 0:
                         hash_1 = checksum.get_for_directory(thing, hash_mode=method, filter_dots=ignore_dots)   # have to call this manually without argparse 
-                    elif hash_2 is None:
+                    else:
                         hash_2 = checksum.get_for_directory(thing, hash_mode=method, filter_dots=ignore_dots)   # have to call this manually without argparse
                 else:
                     if index == 0:
