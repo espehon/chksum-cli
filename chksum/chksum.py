@@ -258,7 +258,6 @@ def stand_alone():
             
             # Finally output time!
             compareHashes(hash_1, hash_2, method) # test, format, and output hashes
-            return True
 
         except KeyboardInterrupt:
             print(Fore.YELLOW + "Keyboard Interrupt!")
