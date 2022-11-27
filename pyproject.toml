@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chksum-cli"
+version = "0.1.0"
+authors = [
+    { name="espehon"},
+]
+description = "Compare checksums from the command line"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "checksum >= 1.0.4",
+    "colorama >= 0.4.6"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: B - Beta",
+    "Environment :: Console",
+    "License :: OSI Approved :: BSD 3-Clause",
+    "Operating System :: OS Independent",
+    "Topic :: Utilities"
+]
+
+[project.scripts]
+chksum = "chksum.__main__:main"
+
+[project.urls]
+"Homepage" = "https://github.com/espehon/chksum-cli"
+"Bug Tracker" = "https://github.com/espehon/chksum-cli/issues"
