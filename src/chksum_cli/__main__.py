@@ -7,4 +7,4 @@ import sys
 from chksum.chksum import cli
 
 if __name__ == "__main__":
-    sys.exit(cli())
+    sys.exit()
