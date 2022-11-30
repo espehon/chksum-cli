@@ -4,7 +4,7 @@
 #  This file is used as the entry point for chksum
 import sys
 
-from chksum.chksum import cli
+from chksum import cli
 
 if __name__ == "__main__":
-    sys.exit()
+    sys.exit(cli())
