@@ -290,10 +290,11 @@ def stand_alone(single_run=False):
             print(Fore.LIGHTRED_EX + e)
         finally:
             program_is_running = False
-            user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
-            if user == 'r':
-                program_is_running = True
-                print('\n' * 3)
+            if single_run is False:
+                user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
+                if user == 'r':
+                    program_is_running = True
+                    print('\n' * 3)
 
 #endregion: Functions
 
