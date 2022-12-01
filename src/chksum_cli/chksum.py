@@ -19,9 +19,8 @@ init(autoreset=True)
 #region: --------------------------------[ Classes ]--------------------------------
 
 class StandaloneMode(argparse.Action):
-
     def __call__(self, parser, namespace, values, option_string=None):
-        print('see ya later alligator')
+        stand_alone(single_run=True)
         parser.exit()
 
 #endregion: Classes
@@ -45,11 +44,9 @@ parser = argparse.ArgumentParser(
     add_help = False # free -h from help (-? will be used as help flag)
 )
 
-exclusive = parser.add_mutually_exclusive_group()
-exclusive.add_argument('-i', '--interactive', action='store_true', help="Run in interactive mode")
-
 
 parser.add_argument('-?', '--help', action='help', help="Show this help message and exit.")     # make -? help
+parser.add_argument('-i', '--interactive', action=StandaloneMode, nargs=0, help="Run in interactive mode")
 parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) files from directories")
 parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
@@ -207,7 +204,7 @@ def cli():
     return True
 
 
-def stand_alone():
+def stand_alone(single_run=False):
     """
     This is the standalone version.
     Logic works as follows:
