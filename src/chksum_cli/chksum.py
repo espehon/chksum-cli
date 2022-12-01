@@ -154,6 +154,7 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
         else:
             outputRow_2 += Fore.RED + hash_2[-offset:]
     
+    print()
     print(str.upper("[" + title + "]").center(width, '-'))  # output formatted info
     print(outputRow_1)
     print(outputRow_2)
@@ -162,6 +163,7 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
         print(Fore.LIGHTGREEN_EX + "√ Hashes Match")
     else:
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
+    print()
 
 
 def cli():
@@ -217,12 +219,16 @@ def stand_alone(single_run=False):
         7. Ask to rerun
     """
     title = f"""\
+
+
       _     _                        
      | |   | |                       
   ___| |__ | | _____ _   _ _ __ ___  
  / __| '_ \| |/ / __| | | | '_ ` _ \ 
 | (__| | | |   <\__ \ |_| | | | | | |
  \___|_| |_|_|\_\___/\__,_|_| |_| |_|
+ Copyright (c) 2022, espehon
+ All rights reserved.
 
  {ALGORITHMS = }
 """
@@ -249,14 +255,33 @@ def stand_alone(single_run=False):
                     case [a, b, c] if a is None and not (b is None or c is None):
                         user = input("Enter Algorithm > ")
 
+                # if str.lower(user) in ALGORITHMS:
+                #     method = str.lower(user)
+                # if hash_1 is None:
+                #     hash_1 = user
+                # elif hash_2 is None:
+                #     hash_2 = user
+                # else:
+                #     print("You've already supplied this requirement...")
+            
                 if str.lower(user) in ALGORITHMS:
                     method = str.lower(user)
-                elif hash_1 is None:
-                    hash_1 = user
-                elif hash_2 is None:
-                    hash_2 = user
+                    print("\tAlgorithm entered...")
                 else:
-                    print("You've already supplied this requirement...")
+                    if os.path.isfile(user):
+                        print("\tFile entered...")
+                    elif os.path.exists(user):
+                        print("\tDirectory entered...")
+                    else:
+                        print("\tHash string entered...")
+                    if hash_1 is None:
+                        hash_1 = user
+                    elif hash_2 is None:
+                        hash_2 = user
+                    else:
+                        print("You've already supplied two objects...")
+
+                
 
             # TODO: #7 user input should be validated on entry, not after all inputs.
             # the following block should be made a function so that it can be called throughout the previous block
