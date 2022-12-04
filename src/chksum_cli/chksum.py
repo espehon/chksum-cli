@@ -245,6 +245,7 @@ def stand_alone(single_run=False):
             hash_2 = None
 
             ignore_dots = None
+            tries = 5
 
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
@@ -266,20 +267,24 @@ def stand_alone(single_run=False):
             
                 if str.lower(user) in ALGORITHMS:
                     method = str.lower(user)
-                    print("\tAlgorithm entered...")
+                    print("\tAlgorithm entered.")
                 else:
                     if os.path.isfile(user):
-                        print("\tFile entered...")
+                        print("\tFile entered.")
                     elif os.path.exists(user):
-                        print("\tDirectory entered...")
+                        print("\tDirectory entered.")
                     else:
-                        print("\tHash string entered...")
+                        print("\tHash string entered.")
                     if hash_1 is None:
                         hash_1 = user
                     elif hash_2 is None:
                         hash_2 = user
                     else:
-                        print("You've already supplied two objects...")
+                        print("\tYou've already supplied two objects...")
+                        tries -= 1
+                        if tries <= 0:
+                            print(Fore.YELLOW + "\tNumber of tries exceeded!")
+                            raise UserWarning
 
                 
 
@@ -311,16 +316,20 @@ def stand_alone(single_run=False):
 
         except KeyboardInterrupt:
             print(Fore.YELLOW + "Keyboard Interrupt!")
+        except UserWarning:
+            print("\tProgress stopped...")
         except Exception as e:
             print(Fore.LIGHTRED_EX + e)
         finally:
             program_is_running = False
             if single_run is False:
-                user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
-                if user == 'r':
-                    program_is_running = True
-                    print('\n' * 3)
-
+                try:    # Incase the user mashes keyboard interrupt
+                    user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
+                    if user == 'r':
+                        program_is_running = True
+                        print('\n' * 3)
+                except KeyboardInterrupt:
+                    print(Fore.YELLOW + "Exiting program...")
 #endregion: Functions
 
 
