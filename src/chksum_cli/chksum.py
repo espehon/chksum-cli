@@ -253,6 +253,7 @@ def stand_alone(single_run=False):
 
             ignore_dots = None
             tries = 3
+            hash_strings = 0
 
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
@@ -284,6 +285,8 @@ def stand_alone(single_run=False):
                         print("\tDirectory entered.")
                     else:
                         print("\tHash string entered.")
+                        if hash_1 is None or hash_2 is None:
+                            hash_strings += 1
                     if hash_1 is None:
                         hash_1 = user
                     elif hash_2 is None:
@@ -291,9 +294,13 @@ def stand_alone(single_run=False):
                     else:
                         print("\tYou've already supplied two objects...")
                         tries -= 1
-                if tries <= 0:
+                if hash_strings >= 2:
+                    method = "STRINGS" # no need for algorithm
+                    break
+                elif tries <= 0:
                     print(Fore.YELLOW + "\tNumber of tries exceeded!")
                     raise UserWarning
+                
 
                 
 
