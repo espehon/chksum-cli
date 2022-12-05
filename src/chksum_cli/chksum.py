@@ -123,6 +123,10 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
     Compare two strings and highlight differences on output.
     Then output True | False.
     """
+    if hash_1.strip() == "" or hash_2.strip() == "":
+        print(Fore.YELLOW + "One or more values were blank...")
+        return "Value(s) were blank"
+
     outputRow_1 = ""    # first hash to print
     outputRow_2 = ""    # second hash to print
     largerRow = None    # keeps track of the larger hash
@@ -160,10 +164,10 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
     print(outputRow_2)
 
     if hash_1 == hash_2:    # output the final result
-        print(Fore.LIGHTGREEN_EX + "√ Hashes Match")
+        print(Fore.LIGHTGREEN_EX + "√ Hashes Match\n")
     else:
-        print(Fore.LIGHTRED_EX + "X Hashes Do Not Match")
-    print()
+        print(Fore.LIGHTRED_EX + "X Hashes Do Not Match\n")
+        return "Hashes Do Not Match"
 
 
 def cli():
@@ -181,7 +185,7 @@ def cli():
 
     if len(positionals) < 2:    # must have at least 2 positionals
         print("Missing positional argument...")
-        return False
+        return "Missing positional"
     
     hashes = []                 # stores the final hashes for output
     iteration = 1               # tracks iteration in the while loop and doubles as a dictionary key
@@ -203,7 +207,6 @@ def cli():
         method = 'Strings'
 
     compareHashes(hashes[0], hashes[1], method) # test, format, and output hashes
-    return True
 
 
 def stand_alone(single_run=False):
@@ -245,7 +248,7 @@ def stand_alone(single_run=False):
             hash_2 = None
 
             ignore_dots = None
-            tries = 5
+            tries = 3
 
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
@@ -264,8 +267,10 @@ def stand_alone(single_run=False):
                 #     hash_2 = user
                 # else:
                 #     print("You've already supplied this requirement...")
-            
-                if str.lower(user) in ALGORITHMS:
+                if user.strip() == "":
+                    tries -= 1
+                    print("\tNothing was entered; please try again.")
+                elif str.lower(user) in ALGORITHMS:
                     method = str.lower(user)
                     print("\tAlgorithm entered.")
                 else:
@@ -282,9 +287,9 @@ def stand_alone(single_run=False):
                     else:
                         print("\tYou've already supplied two objects...")
                         tries -= 1
-                        if tries <= 0:
-                            print(Fore.YELLOW + "\tNumber of tries exceeded!")
-                            raise UserWarning
+                if tries <= 0:
+                    print(Fore.YELLOW + "\tNumber of tries exceeded!")
+                    raise UserWarning
 
                 
 
