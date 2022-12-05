@@ -1,7 +1,7 @@
 # Copyright (c) 2022, espehon
 # All rights reserved.
 
-#  This file is used as the entry point for chksum
+#  This file can be ran from the command line as the entry point for chksum 
 import sys
 
 from chksum import cli

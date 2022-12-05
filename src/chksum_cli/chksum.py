@@ -20,8 +20,7 @@ init(autoreset=True)
 
 class StandaloneMode(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        stand_alone(single_run=True)
-        parser.exit()
+        parser.exit(stand_alone(single_run=True))
 
 #endregion: Classes
 
@@ -165,9 +164,10 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
 
     if hash_1 == hash_2:    # output the final result
         print(Fore.LIGHTGREEN_EX + "√ Hashes Match\n")
+        return True
     else:
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match\n")
-        return "Hashes Do Not Match"
+        return False
 
 
 def cli():
@@ -206,7 +206,11 @@ def cli():
     if hashesWerePrepared:
         method = 'Strings'
 
-    compareHashes(hashes[0], hashes[1], method) # test, format, and output hashes
+    if compareHashes(hashes[0], hashes[1], method): # test, format, and output hashes
+        return 0
+    else:
+        return 1
+    
 
 
 def stand_alone(single_run=False):
@@ -317,7 +321,10 @@ def stand_alone(single_run=False):
                         hash_2 = str.lower(thing)   # checksum returns lowercase
             
             # Finally output time!
-            compareHashes(hash_1, hash_2, method) # test, format, and output hashes
+            if compareHashes(hash_1, hash_2, method) and single_run: # test, format, and output hashes
+                return 0
+            elif single_run:
+                return 1
 
         except KeyboardInterrupt:
             print(Fore.YELLOW + "Keyboard Interrupt!")
@@ -325,16 +332,15 @@ def stand_alone(single_run=False):
             print("\tProgress stopped...")
         except Exception as e:
             print(Fore.LIGHTRED_EX + e)
-        finally:
-            program_is_running = False
-            if single_run is False:
-                try:    # Incase the user mashes keyboard interrupt
-                    user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
-                    if user == 'r':
-                        program_is_running = True
-                        print('\n' * 3)
-                except KeyboardInterrupt:
-                    print(Fore.YELLOW + "Exiting program...")
+        program_is_running = False
+        if single_run is False:
+            try:    # Incase the user mashes keyboard interrupt
+                user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
+                if user == 'r':
+                    program_is_running = True
+                    print('\n' * 3)
+            except KeyboardInterrupt:
+                print(Fore.YELLOW + "Exiting program...")
 #endregion: Functions
 
 
