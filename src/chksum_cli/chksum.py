@@ -38,7 +38,7 @@ class StandaloneMode(argparse.Action):
 
 #region: --------------------------------[ Variables ]--------------------------------
 
-CHKSUM_LICENSE = """Copyright (c) 2022, espehon\nAll rights reserved."""
+CHKSUM_LICENSE = """  Copyright (c) 2022, espehon\n  All rights reserved."""
 
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
@@ -234,9 +234,9 @@ def stand_alone(single_run=False):
  / __| '_ \| |/ / __| | | | '_ ` _ \ 
 | (__| | | |   <\__ \ |_| | | | | | |
  \___|_| |_|_|\_\___/\__,_|_| |_| |_|
- {CHKSUM_LICENSE}
+{CHKSUM_LICENSE}
 
- {ALGORITHMS = }
+{ALGORITHMS = }
 """
     user = ""                   # for storing user input
     program_is_running = True   # for controlling the following while loop
@@ -249,7 +249,7 @@ def stand_alone(single_run=False):
             hash_1 = None
             hash_2 = None
 
-            ignore_dots = None
+            include_dots = None
             tries = 3
             hash_strings = 0
 
@@ -312,13 +312,13 @@ def stand_alone(single_run=False):
                     else:
                         hash_2 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
                 elif os.path.exists(thing):
-                    if ignore_dots is None:
-                        ignore_dots = str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")) == 'n'   # anything other than 'N' will set this to False
-                        print(f"{ignore_dots = }")
+                    if include_dots is None:
+                        include_dots = not str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")).strip() == 'n'   # anything other than 'N' will set this to False
+                        print(f"{include_dots = }")
                     if index == 0:
-                        hash_1 = checksum.get_for_directory(thing, hash_mode=method, filter_dots=ignore_dots)   # have to call this manually without argparse 
+                        hash_1 = checksum.get_for_directory(thing, hash_mode=method, filter_dots= not include_dots)   # have to call this manually without argparse 
                     else:
-                        hash_2 = checksum.get_for_directory(thing, hash_mode=method, filter_dots=ignore_dots)   # have to call this manually without argparse
+                        hash_2 = checksum.get_for_directory(thing, hash_mode=method, filter_dots= not include_dots)   # have to call this manually without argparse
                 else:
                     if index == 0:
                         hash_1 = str.lower(thing)   # checksum returns lowercase

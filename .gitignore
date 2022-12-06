@@ -142,3 +142,4 @@ dmypy.json
 *.vsix
 test.py
 Demo.afdesign
+.testdots
