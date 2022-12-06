@@ -1,3 +1,9 @@
+<p align="center">
+<a href="https://pypi.org/project/chksum-cli/">
+<img align="center" src=""/>
+</a>
+</p>
+
 # chksum
 CLI for comparing two checksums
 
@@ -21,6 +27,10 @@ options:
 
 If the first 2 positional arguments are checksums, the algorithm is not needed. Default is md5.
 ```
+
+
+## Interactive mode
+
 
 
 
