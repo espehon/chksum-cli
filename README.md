@@ -25,7 +25,7 @@ options:
   -i, --interactive  Run in interactive mode.
   -d, --dots         Ignore '.' (dot) files from directories.
 
-If the first 2 positional arguments are checksums, the algorithm is not needed. Default is md5.
+If the first 2 positional arguments are strings, the algorithm is not needed. Default is md5.
 ```
 
 
