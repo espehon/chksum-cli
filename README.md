@@ -27,10 +27,46 @@ options:
 
 If the first 2 positional arguments are strings, the algorithm is not needed. Default is md5.
 ```
+Arguments can be passed in any order\
+E.g. the following are equivalent:\
+`chksum <PathToFile> <PathToDir> sha256 -d`\
+`chksum -d <PathToDir> sha256 <PathToFile>`
 
 
-## Interactive mode
+# Interactive mode
+Use `-i` to enter the interactive mode where arguments can be passed one at a time.
+```
+$ chksum -i
 
+      _     _
+     | |   | |
+  ___| |__ | | _____ _   _ _ __ ___
+ / __| '_ \| |/ / __| | | | '_ ` _ \
+| (__| | | |   <\__ \ |_| | | | | | |
+ \___|_| |_|_|\_\___/\__,_|_| |_| |_|
+ Copyright (c) 2022, espehon
+ All rights reserved.
+
+ ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
+
+Enter Algorithm or path to File or Directory >
+```
+Inputs are checked after each entry and the prompt is updated accordingly
+```
+Enter Algorithm or path to File or Directory > ./
+        Directory entered.
+Enter Algorithm or path to File or Directory > ./
+        Directory entered.
+Enter Algorithm > md5
+        Algorithm entered.
+Do you want to include '.' (dot) files? [Y/n] > n
+ignore_dots = True
+
+-------------[MD5]--------------
+23bbc59717b7375774fe97cbfc5fd12c
+23bbc59717b7375774fe97cbfc5fd12c
+√ Hashes Match
+```
 
 
 
