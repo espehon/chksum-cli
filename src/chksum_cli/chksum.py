@@ -4,14 +4,22 @@
 
 
 
+
 #region: --------------------------------[ Imports ]--------------------------------
 import os
 import argparse
+import importlib.metadata
+try:
+    __version__ = f"chksum {importlib.metadata.version('chksum_cli')} from chksum_cli"
+except:
+    __version__ = "Package not installed..."
+
 import checksum
 from colorama import Fore, init
 init(autoreset=True)
 
 #endregion: Imports
+
 
 
 
@@ -23,6 +31,8 @@ class StandaloneMode(argparse.Action):
         parser.exit(stand_alone(single_run=True))
 
 #endregion: Classes
+
+
 
 
 
@@ -45,21 +55,12 @@ parser = argparse.ArgumentParser(
 
 
 parser.add_argument('-?', '--help', action='help', help="Show this help message and exit.")     # make -? help
-parser.add_argument('-i', '--interactive', action=StandaloneMode, nargs=0, help="Run in interactive mode")
-parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) files from directories")
+parser.add_argument('-v', '--version', action='version', version=__version__, help="Show package version and exit.")     # make -? help
+parser.add_argument('-i', '--interactive', action=StandaloneMode, nargs=0, help="Run in interactive mode.")
+parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) files from directories.")
 parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
-
-
-
-
-
-# parser.add_argument('-?', '--help', action='help', help="Show this help message and exit.")     # make -? help
-# parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) files from directories")
-# parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
-# parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
-# parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
 
 #endregion: Variables
 
@@ -212,7 +213,6 @@ def cli():
         return 1
     
 
-
 def stand_alone(single_run=False):
     """
     This is the standalone version.
@@ -234,12 +234,10 @@ def stand_alone(single_run=False):
  / __| '_ \| |/ / __| | | | '_ ` _ \ 
 | (__| | | |   <\__ \ |_| | | | | | |
  \___|_| |_|_|\_\___/\__,_|_| |_| |_|
- Copyright (c) 2022, espehon
- All rights reserved.
+ {CHKSUM_LICENSE}
 
  {ALGORITHMS = }
 """
-    print(CHKSUM_LICENSE)
     user = ""                   # for storing user input
     program_is_running = True   # for controlling the following while loop
 
