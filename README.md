@@ -1,6 +1,6 @@
 <p align="center">
 <a href="https://pypi.org/project/chksum-cli/">
-<img align="center" src=""/>
+<img align="center" src="https://raw.githubusercontent.com/espehon/chksum-cli/blob/main/docs/images/Demo.png"/>
 </a>
 </p>
 
