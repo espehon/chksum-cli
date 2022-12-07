@@ -262,14 +262,6 @@ def stand_alone(single_run=False):
                     case [a, b, c] if a is None and not (b is None or c is None):
                         user = input("Enter Algorithm > ")
 
-                # if str.lower(user) in ALGORITHMS:
-                #     method = str.lower(user)
-                # if hash_1 is None:
-                #     hash_1 = user
-                # elif hash_2 is None:
-                #     hash_2 = user
-                # else:
-                #     print("You've already supplied this requirement...")
                 if user.strip() == "":
                     tries -= 1
                     print("\tNothing was entered; please try again.")
@@ -298,12 +290,6 @@ def stand_alone(single_run=False):
                 elif tries <= 0:
                     print(Fore.YELLOW + "\tNumber of tries exceeded!")
                     raise UserWarning
-                
-
-                
-
-            # TODO: #7 user input should be validated on entry, not after all inputs.
-            # the following block should be made a function so that it can be called throughout the previous block
 
             for index, thing in enumerate([hash_1, hash_2]):
                 if os.path.isfile(thing):
@@ -347,6 +333,3 @@ def stand_alone(single_run=False):
             except KeyboardInterrupt:
                 print(Fore.YELLOW + "Exiting program...")
 #endregion: Functions
-
-
-
