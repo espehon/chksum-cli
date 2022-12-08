@@ -60,11 +60,11 @@ Enter Algorithm or path to File or Directory > ./
 Enter Algorithm > md5
         Algorithm entered.
 Do you want to include '.' (dot) files? [Y/n] > n
-ignore_dots = True
+include_dots = False
 
 -------------[MD5]--------------
-23bbc59717b7375774fe97cbfc5fd12c
-23bbc59717b7375774fe97cbfc5fd12c
+59198d6aad1674a0b372027ce275a9b6
+59198d6aad1674a0b372027ce275a9b6
 √ Hashes Match
 ```
 
