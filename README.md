@@ -7,6 +7,16 @@
 # chksum
 CLI for comparing two checksums
 
+<br>
+
+# Install
+Requires Python >= 3.10
+```
+pip install chksum-cli
+```
+
+<br>
+
 # Usage
 ```
 CHKSUM [-?] [-i] [-d] position1 position2 [position3]
@@ -27,11 +37,12 @@ options:
 
 If the first 2 positional arguments are strings, the algorithm is not needed. Default is md5.
 ```
-Arguments can be passed in any order\
+Arguments can be passed in any order [[note](#issues)]\
 E.g. the following are equivalent:\
 `chksum <PathToFile> <PathToDir> sha256 -d`\
 `chksum -d <PathToDir> sha256 <PathToFile>`
 
+<br>
 
 # Interactive mode
 Use `-i` to enter the interactive mode where arguments can be passed one at a time.
@@ -68,9 +79,16 @@ include_dots = False
 √ Hashes Match
 ```
 
+<br>
 
+# <a name="issues"></a>Issues
+Using `-d` in between second and third positional causes an argparse error. (See Issue: [#11](https://github.com/espehon/chksum-cli/issues/11))\
+Example:\
+        `$ chksum ./file ./file -d sha1`
 
-## Authors
+<br>
+
+# Authors
 
 - [@espehon](https://www.github.com/espehon)
 
