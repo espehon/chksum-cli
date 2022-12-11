@@ -69,6 +69,9 @@ parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or a
 
 
 #region: --------------------------------[ Functions ]--------------------------------
+def getFullPath(relativePath: str):
+    return os.path.expanduser(relativePath)
+
 def storeDir(value: str, key: int):
     positionals[key] = {'value': value, 'type': 'dir'}
 
@@ -101,6 +104,9 @@ def processPositional(value: str, key: int):
     The value is considered a hashed value if none of the above.
     Files and directories hashed in order of positionals[iteration].
     """
+    if '~' in value:
+        value = getFullPath(value)
+
     if str.lower(value) in ALGORITHMS:
         setAlgorithm(value)
     elif os.path.isfile(value):
@@ -269,6 +275,8 @@ def stand_alone(single_run=False):
                     method = str.lower(user)
                     print("\tAlgorithm entered.")
                 else:
+                    if '~' in user:
+                        user = getFullPath(user)
                     if os.path.isfile(user):
                         print("\tFile entered.")
                     elif os.path.exists(user):
