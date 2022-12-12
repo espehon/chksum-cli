@@ -1,103 +1,97 @@
 # Copyright (c) 2022, espehon
 # All rights reserved.
 
+"""CHKSUM
+Compare checksums from the command line easily and with visual feedback.
+Goal: A CLI app that isn't picky about the order of arguments (user friendly)"""
 
-
-
-
-#region: --------------------------------[ Imports ]--------------------------------
 import os
 import argparse
 import importlib.metadata
-try:
-    __version__ = f"chksum {importlib.metadata.version('chksum_cli')} from chksum_cli"
-except:
-    __version__ = "Package not installed..."
 
 import checksum
 from colorama import Fore, init
 init(autoreset=True)
 
-#endregion: Imports
+try:
+    __version__ = f"chksum {importlib.metadata.version('chksum_cli')} from chksum_cli"
+except importlib.metadata.PackageNotFoundError:
+    __version__ = "Package not installed..."
 
-
-
-
-
-#region: --------------------------------[ Classes ]--------------------------------
 
 class StandaloneMode(argparse.Action):
+    """ Custom action for running the interactive mode"""
     def __call__(self, parser, namespace, values, option_string=None):
+        # redefined-outer-name -> https://docs.python.org/3/library/argparse.html
         parser.exit(stand_alone(single_run=True))
 
-#endregion: Classes
-
-
-
-
-
-#region: --------------------------------[ Variables ]--------------------------------
 
 CHKSUM_LICENSE = """  Copyright (c) 2022, espehon\n  All rights reserved."""
 
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
 positionals = {}    # for storing positionals their type
-method = 'md5'      # default algorithm
+method = 'md5'      # algorithm to be used. Currently set as default (not a constant)
 
 parser = argparse.ArgumentParser(
     prog="CHKSUM",
-    description = f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \n{ALGORITHMS = }",
+    description = (f"Calculate and compare the checksums of files or directories.\n\
+        Can also compare against pasted strings. \n{ALGORITHMS = }"),
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog = f"If the first 2 positional arguments are strings, the algorithm is not needed. Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF",
+    epilog = (f"If the first 2 positional arguments are strings, the algorithm is not needed.\
+            Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\t\
+            Example 2: chksum 123456789ABCDEF 123456789ABCDEF\n\t\
+            Example 3: chksum ./dir 123456789ABCDEF"),
     add_help = False # free -h from help (-? will be used as help flag)
 )
+parser.add_argument('-?', '--help', action='help',
+                    help="Show this help message and exit.")     # make -? help
 
+parser.add_argument('-v', '--version', action='version',
+                    version=__version__, help="Show package version and exit.")     # make -? help
 
-parser.add_argument('-?', '--help', action='help', help="Show this help message and exit.")     # make -? help
-parser.add_argument('-v', '--version', action='version', version=__version__, help="Show package version and exit.")     # make -? help
-parser.add_argument('-i', '--interactive', action=StandaloneMode, nargs=0, help="Run in interactive mode.")
-parser.add_argument('-d', '--dots', action='store_true', help="Ignore '.' (dot) files from directories.")
+parser.add_argument('-i', '--interactive', action=StandaloneMode,
+                    nargs=0, help="Run in interactive mode.")
+
+parser.add_argument('-d', '--dots', action='store_true',
+                    help="Ignore '.' (dot) files from directories.")
+                    
 parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
 parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
 
-#endregion: Variables
 
+def get_full_path(relative_path: str):
+    """Takes a $HOME relative path and returns the absolute path"""
+    return os.path.expanduser(relative_path)
 
-
-
-
-#region: --------------------------------[ Functions ]--------------------------------
-def getFullPath(relativePath: str):
-    return os.path.expanduser(relativePath)
-
-def storeDir(value: str, key: int):
+def store_dir(value: str, key: int):
+    """Stores the value in positionals and marks it as a directory"""
     positionals[key] = {'value': value, 'type': 'dir'}
 
-
-def storeFile(value: str, key: int):
+def store_file(value: str, key: int):
+    """Stores the value in positionals and marks it as a file"""
     positionals[key] = {'value': value, 'type': 'file'}
 
-
-def storeHash(value: str, key: int):
+def store_hash(value: str, key: int):
+    """Stores the value in positionals and marks it as a hash"""
     positionals[key] = {'value': value, 'type': 'hash'}
 
-
-def setAlgorithm(value: str):
+def set_algorithm(value: str):
+    """Overrides the method with the given value"""
     global method
     method = str.lower(value)
 
-
-def hashFile(value: str):
-    positionals.append(getHash(value))
-
-
-def hashDir(value: str):
-    positionals.append(getHash(value, dir=True))
+#region: --------------------------------[ remove ]--------------------------------
+# def hashFile(value: str):
+#     positionals.append(getHash(value))
 
 
-def processPositional(value: str, key: int):
+# def hashDir(value: str):
+#     positionals.append(getHash(value, dir=True))
+#endregion: remove
+
+def process_positional(value: str, key: int):
     """
     This function will determine what to do with positional arguments (value) that the user passed.
     It will first check if the value is an algorithm, then if it is a file, then directory.
@@ -105,26 +99,25 @@ def processPositional(value: str, key: int):
     Files and directories hashed in order of positionals[iteration].
     """
     if '~' in value:
-        value = getFullPath(value)
+        value = get_full_path(value)
 
     if str.lower(value) in ALGORITHMS:
-        setAlgorithm(value)
+        set_algorithm(value)
     elif os.path.isfile(value):
-        storeFile(value, key)
+        store_file(value, key)
     elif os.path.exists(value):
-        storeDir(value, key)
+        store_dir(value, key)
     else:
-        storeHash(str.lower(value), key) # checksum returns lowercase
+        store_hash(str.lower(value), key) # checksum returns lowercase
 
-
-def getHash(path: str,  dir: bool=False) -> str:
-    if dir:
+def get_hash(path: str, is_directory: bool=False) -> str:
+    """Returns the checksum of the given path"""
+    if is_directory:
         return checksum.get_for_directory(path, hash_mode=method, filter_dots=args.dots)
-    else:
-        return checksum.get_for_file(path, hash_mode=method)
+    return checksum.get_for_file(path, hash_mode=method)
 
 
-def compareHashes(hash_1: str, hash_2: str, title: str):
+def compare_hashes(hash_1: str, hash_2: str, title: str):
     """
     Compare two strings and highlight differences on output.
     Then output True | False.
@@ -132,42 +125,39 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
     if hash_1.strip() == "" or hash_2.strip() == "":
         print(Fore.YELLOW + "One or more values were blank...")
         return "Value(s) were blank"
-
-    outputRow_1 = ""    # first hash to print
-    outputRow_2 = ""    # second hash to print
-    largerRow = None    # keeps track of the larger hash
-    offset = None       # difference in hash sizes
-    width = 0           # for title bar formatting
-    
-    match [len(hash_1), len(hash_2)]:   # set logic depending on sizes of hashes for coloring (and to continue where zip stops)
+    output_row_1 = ""       # first hash to print
+    output_row_2 = ""       # second hash to print
+    larger_row = None       # keeps track of the larger hash
+    offset = 0              # difference in hash sizes
+    width = 0               # for title bar formatting
+    match [len(hash_1), len(hash_2)]:
+        # set logic depending on sizes of hashes for coloring (and to continue where zip stops)
         case [a, b] if a == b:
             width = a
         case [a, b] if a > b:
             offset = a - b
-            largerRow = 1
+            larger_row = 1
             width = a
         case [a, b] if a < b:
             offset = b - a
             width = b
-    
-    for (a, b) in zip(hash_1, hash_2):  # color matching characters green and non matching yellow (orange)
+    for (a, b) in zip(hash_1, hash_2):
+        # color matching characters green and non matching yellow (orange)
         if a == b:
-            outputRow_1 += Fore.GREEN + a
-            outputRow_2 += Fore.GREEN + b
+            output_row_1 += Fore.GREEN + a
+            output_row_2 += Fore.GREEN + b
         else:
-            outputRow_1 += Fore.YELLOW + a
-            outputRow_2 += Fore.YELLOW + b
-    
-    if offset is not None:  # pickup where zip stopped. Make extra characters red
-        if largerRow == 1:
-            outputRow_1 += Fore.RED + hash_1[-offset:]
+            output_row_1 += Fore.YELLOW + a
+            output_row_2 += Fore.YELLOW + b
+    if offset != 0:  # pickup where zip stopped. Make extra characters red
+        if larger_row == 1:
+            output_row_1 += Fore.RED + hash_1[-offset :]
         else:
-            outputRow_2 += Fore.RED + hash_2[-offset:]
-    
+            output_row_2 += Fore.RED + hash_2[-offset :]
     print()
     print(str.upper("[" + title + "]").center(width, '-'))  # output formatted info
-    print(outputRow_1)
-    print(outputRow_2)
+    print(output_row_1)
+    print(output_row_2)
 
     if hash_1 == hash_2:    # output the final result
         print(Fore.LIGHTGREEN_EX + "√ Hashes Match\n")
@@ -178,49 +168,47 @@ def compareHashes(hash_1: str, hash_2: str, title: str):
 
 
 def cli():
+    """Processes the command line arguments and outputs accordingly.
+    This is the main logic for the program when ran as one line (not in interactive mode)"""
     global method
     global args
+    args = parser.parse_args()              # get args from input
 
-    args = parser.parse_args()  # get args from input
-
-    processPositional(args.position1, 1)    # store positional accordingly
-    processPositional(args.position2, 2)    # store positional accordingly
+    process_positional(args.position1, 1)   # store positional accordingly
+    process_positional(args.position2, 2)   # store positional accordingly
     try:
-            processPositional(args.position3, 3)    # store optional 3rd positional
-    except:
+        process_positional(args.position3, 3)    # store optional 3rd positional
+    except TypeError:
+        # There was no third positional
         pass
-
     if len(positionals) < 2:    # must have at least 2 positionals
-        print("Missing positional argument...")
-        return "Missing positional"
-    
-    hashes = []                 # stores the final hashes for output
-    iteration = 1               # tracks iteration in the while loop and doubles as a dictionary key
-    hashesWerePrepared = True   # is set to False if this script runs the hash. Used to decide output title
+        return "Missing positional argument..."
 
-    while len(hashes) < 2 and iteration <= 3:   # iterate through stored positionals and hash them accordingly
+    hashes = []                 # stores the final hashes for output
+    iteration = 1               # tracks iteration and doubles as a dictionary key
+    hashes_were_prepared = True   # is set to False if this script runs the hash.
+    while len(hashes) < 2 and iteration <= 3:
+        # iterate through stored positionals and hash them accordingly
         if iteration in positionals:
             if positionals[iteration]['type'] == 'dir':
-                hashes.append(getHash(positionals[iteration]['value'], dir=True))
-                hashesWerePrepared = False
+                hashes.append(get_hash(positionals[iteration]['value'], is_directory=True))
+                hashes_were_prepared = False
             elif positionals[iteration]['type'] == 'file':
-                hashes.append(getHash(positionals[iteration]['value']))
-                hashesWerePrepared = False
+                hashes.append(get_hash(positionals[iteration]['value']))
+                hashes_were_prepared = False
             elif positionals[iteration]['type'] == 'hash':
                 hashes.append(positionals[iteration]['value'])
         iteration += 1
-    
-    if hashesWerePrepared:
-        method = 'Strings'
 
-    if compareHashes(hashes[0], hashes[1], method): # test, format, and output hashes
+    if hashes_were_prepared:
+        method = 'Strings'
+    if compare_hashes(hashes[0], hashes[1], method): # test, format, and output hashes
         return 0
-    else:
-        return 1
+    return 1
     
 
 def stand_alone(single_run=False):
-    """
+    """ Interactive mode
     This is the standalone version.
     Logic works as follows:
         1. Get 1 of 3 options from user
@@ -231,7 +219,7 @@ def stand_alone(single_run=False):
         6. Test, format, and output hashes
         7. Ask to rerun
     """
-    title = f"""\
+    title = fr"""\
 
 
       _     _                        
@@ -276,7 +264,7 @@ def stand_alone(single_run=False):
                     print("\tAlgorithm entered.")
                 else:
                     if '~' in user:
-                        user = getFullPath(user)
+                        user = get_full_path(user)
                     if os.path.isfile(user):
                         print("\tFile entered.")
                     elif os.path.exists(user):
@@ -295,32 +283,34 @@ def stand_alone(single_run=False):
                 if hash_strings >= 2:
                     method = "STRINGS" # no need for algorithm
                     break
-                elif tries <= 0:
+                if tries <= 0:
                     print(Fore.YELLOW + "\tNumber of tries exceeded!")
                     raise UserWarning
 
             for index, thing in enumerate([hash_1, hash_2]):
                 if os.path.isfile(thing):
                     if index == 0:
-                        hash_1 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
+                        hash_1 = checksum.get_for_file(thing, hash_mode=method)
                     else:
-                        hash_2 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
+                        hash_2 = checksum.get_for_file(thing, hash_mode=method)
                 elif os.path.exists(thing):
                     if include_dots is None:
-                        include_dots = str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")).strip() != 'n'   # anything other than 'N' will set this to False
+                        include_dots = str.lower(input("Do you want to include '.' (dot) files? \
+                            [Y/n] > ")).strip() != 'n'
                         print(f"{include_dots = }")
                     if index == 0:
-                        hash_1 = checksum.get_for_directory(thing, hash_mode=method, filter_dots= not include_dots)   # have to call this manually without argparse 
+                        hash_1 = checksum.get_for_directory(thing, hash_mode=method,
+                        filter_dots= not include_dots)
                     else:
-                        hash_2 = checksum.get_for_directory(thing, hash_mode=method, filter_dots= not include_dots)   # have to call this manually without argparse
+                        hash_2 = checksum.get_for_directory(thing, hash_mode=method,
+                        filter_dots= not include_dots)
                 else:
                     if index == 0:
                         hash_1 = str.lower(thing)   # checksum returns lowercase
                     else:
                         hash_2 = str.lower(thing)   # checksum returns lowercase
-            
             # Finally output time!
-            if compareHashes(hash_1, hash_2, method) and single_run: # test, format, and output hashes
+            if compare_hashes(hash_1, hash_2, method) and single_run: # test, format, and output
                 return 0
             return 1
 
@@ -328,8 +318,8 @@ def stand_alone(single_run=False):
             print(Fore.YELLOW + "Keyboard Interrupt!")
         except UserWarning:
             print("\tProgress stopped...")
-        except Exception as e:
-            print(Fore.LIGHTRED_EX + e)
+        # except Exception as e:
+        #     print(Fore.LIGHTRED_EX + e)
         program_is_running = False
         if single_run is False:
             try:    # Incase the user mashes keyboard interrupt
@@ -339,4 +329,3 @@ def stand_alone(single_run=False):
                     print('\n' * 3)
             except KeyboardInterrupt:
                 print(Fore.YELLOW + "Exiting program...")
-#endregion: Functions
