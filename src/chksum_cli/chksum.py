@@ -299,7 +299,7 @@ def stand_alone(single_run=False):
                         hash_2 = checksum.get_for_file(thing, hash_mode=method)     # calling this manually to be safe
                 elif os.path.exists(thing):
                     if include_dots is None:
-                        include_dots = not str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")).strip() == 'n'   # anything other than 'N' will set this to False
+                        include_dots = str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")).strip() != 'n'   # anything other than 'N' will set this to False
                         print(f"{include_dots = }")
                     if index == 0:
                         hash_1 = checksum.get_for_directory(thing, hash_mode=method, filter_dots= not include_dots)   # have to call this manually without argparse 
@@ -314,8 +314,7 @@ def stand_alone(single_run=False):
             # Finally output time!
             if compareHashes(hash_1, hash_2, method) and single_run: # test, format, and output hashes
                 return 0
-            elif single_run:
-                return 1
+            return 1
 
         except KeyboardInterrupt:
             print(Fore.YELLOW + "Keyboard Interrupt!")
