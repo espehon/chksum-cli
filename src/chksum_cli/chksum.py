@@ -35,30 +35,45 @@ method = 'md5'      # algorithm to be used. Currently set as default (not a cons
 
 parser = argparse.ArgumentParser(
     prog="CHKSUM",
-    description = (f"Calculate and compare the checksums of files or directories.\n\
-        Can also compare against pasted strings. \n{ALGORITHMS = }"),
+    description = (f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \n{ALGORITHMS = }"),
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog = (f"If the first 2 positional arguments are strings, the algorithm is not needed.\
-            Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\t\
-            Example 2: chksum 123456789ABCDEF 123456789ABCDEF\n\t\
-            Example 3: chksum ./dir 123456789ABCDEF"),
+    epilog = (f"If the first 2 positional arguments are strings, the algorithm is not needed. Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF"),
     add_help = False # free -h from help (-? will be used as help flag)
 )
-parser.add_argument('-?', '--help', action='help',
+parser.add_argument('-?',
+                    '--help',
+                    action='help',
                     help="Show this help message and exit.")     # make -? help
 
-parser.add_argument('-v', '--version', action='version',
-                    version=__version__, help="Show package version and exit.")     # make -? help
+parser.add_argument('-v',
+                    '--version',
+                    action='version',
+                    version=__version__,
+                    help="Show package version and exit.")
 
-parser.add_argument('-i', '--interactive', action=StandaloneMode,
-                    nargs=0, help="Run in interactive mode.")
+parser.add_argument('-i',
+                    '--interactive',
+                    action=StandaloneMode,
+                    nargs=0,
+                    help="Run in interactive mode. (mutually exclusive")
 
-parser.add_argument('-d', '--dots', action='store_true',
+parser.add_argument('-d',
+                    '--dots',
+                    action='store_true',
                     help="Ignore '.' (dot) files from directories.")
                     
-parser.add_argument('position1', type=str, help="Checksum, file, or algorithm")
-parser.add_argument('position2', type=str, help="Checksum, file, or algorithm")
-parser.add_argument('position3', type=str, nargs='?', help="Checksum, file, or algorithm")
+parser.add_argument('position1',
+                    type=str,
+                    help="Checksum, file, or algorithm")
+
+parser.add_argument('position2',
+                    type=str,
+                    help="Checksum, file, or algorithm")
+
+parser.add_argument('position3',
+                    type=str,
+                    nargs='?',
+                    help="Checksum, file, or algorithm")
 
 
 def get_full_path(relative_path: str):
@@ -224,7 +239,7 @@ def stand_alone(single_run=False):
         6. Test, format, and output hashes
         7. Ask to rerun
     """
-    title = fr"""\
+    title = fr"""
 
 
       _     _                        
@@ -300,8 +315,7 @@ def stand_alone(single_run=False):
                         hash_2 = checksum.get_for_file(thing, hash_mode=method)
                 elif os.path.exists(thing):
                     if include_dots is None:
-                        include_dots = str.lower(input("Do you want to include '.' (dot) files? \
-                            [Y/n] > ")).strip() != 'n'
+                        include_dots = str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")).strip() != 'n'
                         print(f"{include_dots = }")
                     if index == 0:
                         hash_1 = checksum.get_for_directory(thing, hash_mode=method,
