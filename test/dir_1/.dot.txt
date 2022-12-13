@@ -1,0 +1,3 @@
+This is a dummy file for testing checksums.
+
+salt = 4742fddac305d5e157055f1e6f575a71

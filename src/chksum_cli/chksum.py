@@ -167,12 +167,17 @@ def compare_hashes(hash_1: str, hash_2: str, title: str):
         return False
 
 
-def cli():
+# def get_args(arguments):
+#     global args
+#     args =
+
+
+def cli(argv=None):
     """Processes the command line arguments and outputs accordingly.
     This is the main logic for the program when ran as one line (not in interactive mode)"""
     global method
     global args
-    args = parser.parse_args()              # get args from input
+    args = parser.parse_args(argv)              # get args from input
 
     process_positional(args.position1, 1)   # store positional accordingly
     process_positional(args.position2, 2)   # store positional accordingly
