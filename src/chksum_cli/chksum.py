@@ -319,8 +319,10 @@ def stand_alone(single_run=False):
 
             # Finally output time!
             if compare_hashes(hash_1, hash_2, method) and single_run: # test, format, and output
-                return 0
-            return 1
+                return 0    # if in single run mode, exit program with code 0
+            elif single_run:
+                return 1    # if in single run mode, exit program with code 1
+            # else (if not in single mode) continue though loop
 
         except KeyboardInterrupt:
             print(Fore.YELLOW + "Keyboard Interrupt!")
