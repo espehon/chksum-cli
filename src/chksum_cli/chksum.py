@@ -3,7 +3,7 @@
 
 """CHKSUM
 Compare checksums from the command line easily and with visual feedback.
-Goal: A CLI app that isn't picky about the order of arguments (user friendly)"""
+Goal: A CLI app that isn't picky about the order of arguments (user friendly!!!)"""
 
 import os
 import argparse
@@ -43,38 +43,38 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-?',
                     '--help',
                     action='help',
-                    help="Show this help message and exit.")     # make -? help
-
+                    help="Show this help message and exit."     # make -? help
+)
 parser.add_argument('-v',
                     '--version',
                     action='version',
                     version=__version__,
-                    help="Show package version and exit.")
-
+                    help="Show package version and exit."
+)
 parser.add_argument('-i',
                     '--interactive',
                     action=StandaloneMode,
                     nargs=0,
-                    help="Run in interactive mode. (mutually exclusive")
-
+                    help="Run in interactive mode. (mutually exclusive)"
+)
 parser.add_argument('-d',
                     '--dots',
                     action='store_true',
-                    help="Ignore '.' (dot) files from directories.")
-                    
+                    help="Ignore '.' (dot) files from directories."
+)
 parser.add_argument('position1',
                     type=str,
-                    help="Checksum, file, or algorithm")
-
+                    help="Checksum, file, or algorithm"
+)
 parser.add_argument('position2',
                     type=str,
-                    help="Checksum, file, or algorithm")
-
+                    help="Checksum, file, or algorithm"
+)
 parser.add_argument('position3',
                     type=str,
                     nargs='?',
-                    help="Checksum, file, or algorithm")
-
+                    help="Checksum, file, or algorithm"
+)
 
 def get_full_path(relative_path: str):
     """Takes a $HOME relative path and returns the absolute path"""
@@ -96,15 +96,6 @@ def set_algorithm(value: str):
     """Overrides the method with the given value"""
     global method
     method = str.lower(value)
-
-#region: --------------------------------[ remove ]--------------------------------
-# def hashFile(value: str):
-#     positionals.append(getHash(value))
-
-
-# def hashDir(value: str):
-#     positionals.append(getHash(value, dir=True))
-#endregion: remove
 
 def process_positional(value: str, key: int):
     """
@@ -169,8 +160,10 @@ def compare_hashes(hash_1: str, hash_2: str, title: str):
             output_row_1 += Fore.RED + hash_1[-offset :]
         else:
             output_row_2 += Fore.RED + hash_2[-offset :]
+    
+    # output formatted info
     print()
-    print(str.upper("[" + title + "]").center(width, '-'))  # output formatted info
+    print(str.upper("[" + title + "]").center(width, '-'))
     print(output_row_1)
     print(output_row_2)
 
@@ -180,11 +173,6 @@ def compare_hashes(hash_1: str, hash_2: str, title: str):
     else:
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match\n")
         return False
-
-
-# def get_args(arguments):
-#     global args
-#     args =
 
 
 def cli(argv=None):
@@ -328,6 +316,7 @@ def stand_alone(single_run=False):
                         hash_1 = str.lower(thing)   # checksum returns lowercase
                     else:
                         hash_2 = str.lower(thing)   # checksum returns lowercase
+
             # Finally output time!
             if compare_hashes(hash_1, hash_2, method) and single_run: # test, format, and output
                 return 0
@@ -337,8 +326,7 @@ def stand_alone(single_run=False):
             print(Fore.YELLOW + "Keyboard Interrupt!")
         except UserWarning:
             print("\tProgress stopped...")
-        # except Exception as e:
-        #     print(Fore.LIGHTRED_EX + e)
+
         program_is_running = False
         if single_run is False:
             try:    # Incase the user mashes keyboard interrupt
