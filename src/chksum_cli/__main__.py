@@ -1,5 +1,5 @@
 # Copyright (c) 2022, espehon
-# All rights reserved.
+# License: https://www.gnu.org/licenses/gpl-3.0.html
 
 #  This file can be ran from the command line as the entry point for chksum 
 import sys

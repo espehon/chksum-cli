@@ -1,5 +1,5 @@
 # Copyright (c) 2022, espehon
-# All rights reserved.
+# License: https://www.gnu.org/licenses/gpl-3.0.html
 
 """CHKSUM
 Compare checksums from the command line easily and with visual feedback.
@@ -26,7 +26,7 @@ class StandaloneMode(argparse.Action):
         parser.exit(stand_alone(single_run=True))
 
 
-CHKSUM_LICENSE = """  Copyright (c) 2022, espehon\n  All rights reserved."""
+CHKSUM_LICENSE = """Copyright (c) 2022, espehon\n  License: https://www.gnu.org/licenses/gpl-3.0.html"""
 
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
@@ -122,6 +122,15 @@ def get_hash(path: str, is_directory: bool=False) -> str:
         return checksum.get_for_directory(path, hash_mode=method, filter_dots=args.dots)
     return checksum.get_for_file(path, hash_mode=method)
 
+def yield_license_once() -> str:
+    first_run = True
+    while True:
+        if first_run:
+            first_run = False
+            yield CHKSUM_LICENSE
+        else:
+            yield ""
+
 
 def compare_hashes(hash_1: str, hash_2: str, title: str):
     """
@@ -195,18 +204,25 @@ def cli(argv=None):
     hashes = []                 # stores the final hashes for output
     iteration = 1               # tracks iteration and doubles as a dictionary key
     hashes_were_prepared = True   # is set to False if this script runs the hash.
-    while len(hashes) < 2 and iteration <= 3:
-        # iterate through stored positionals and hash them accordingly
-        if iteration in positionals:
-            if positionals[iteration]['type'] == 'dir':
-                hashes.append(get_hash(positionals[iteration]['value'], is_directory=True))
-                hashes_were_prepared = False
-            elif positionals[iteration]['type'] == 'file':
-                hashes.append(get_hash(positionals[iteration]['value']))
-                hashes_were_prepared = False
-            elif positionals[iteration]['type'] == 'hash':
-                hashes.append(positionals[iteration]['value'])
-        iteration += 1
+    try:
+        while len(hashes) < 2 and iteration <= 3:
+            # iterate through stored positionals and hash them accordingly
+            if iteration in positionals:
+                if positionals[iteration]['type'] == 'dir':
+                    hashes.append(get_hash(positionals[iteration]['value'], is_directory=True))
+                    hashes_were_prepared = False
+                elif positionals[iteration]['type'] == 'file':
+                    hashes.append(get_hash(positionals[iteration]['value']))
+                    hashes_were_prepared = False
+                elif positionals[iteration]['type'] == 'hash':
+                    hashes.append(positionals[iteration]['value'])
+            iteration += 1
+    except KeyboardInterrupt:
+        print(Fore.YELLOW + "Keyboard Interrupt!")
+        return 0
+    except PermissionError:
+        print(Fore.LIGHTRED_EX + "Permission Denied.")
+        return 1
 
     if hashes_were_prepared:
         method = 'Strings'
@@ -236,7 +252,7 @@ def stand_alone(single_run=False):
  / __| '_ \| |/ / __| | | | '_ ` _ \ 
 | (__| | | |   <\__ \ |_| | | | | | |
  \___|_| |_|_|\_\___/\__,_|_| |_| |_|
-{CHKSUM_LICENSE}
+{print(yield_license_once())}
 
 {ALGORITHMS = }
 """
@@ -328,6 +344,8 @@ def stand_alone(single_run=False):
             print(Fore.YELLOW + "Keyboard Interrupt!")
         except UserWarning:
             print("\tProgress stopped...")
+        except PermissionError:
+            print(Fore.LIGHTRED_EX + "Permission Denied.")
 
         program_is_running = False
         if single_run is False:

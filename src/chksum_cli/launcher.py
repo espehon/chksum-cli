@@ -1,5 +1,5 @@
 # Copyright (c) 2022, espehon
-# All rights reserved.
+# License: https://www.gnu.org/licenses/gpl-3.0.html
 
 #  This file is used to launch chksum's non-CLI version
 
