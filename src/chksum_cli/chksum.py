@@ -122,7 +122,7 @@ def get_hash(path: str, is_directory: bool=False) -> str:
         return checksum.get_for_directory(path, hash_mode=method, filter_dots=args.dots)
     return checksum.get_for_file(path, hash_mode=method)
 
-def yield_license_once() -> str:
+def yield_license_once() -> object:
     """Generator function for return CHKSUM_LICENSE once"""
     first_run = True
     while True:
