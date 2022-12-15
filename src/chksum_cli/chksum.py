@@ -276,9 +276,9 @@ def stand_alone(single_run=False):
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
                     case [a, b, c] if a is None and (b is None or c is None):
-                        user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm or path to File or Directory > " + Fore.RESET)
+                        user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm or Path to File or Directory > " + Fore.RESET)
                     case [a, b, c] if a is not None and (b is None or c is None):
-                        user = input(Fore.LIGHTBLUE_EX + "Enter path to File or Directory > " + Fore.RESET)
+                        user = input(Fore.LIGHTBLUE_EX + "Enter Path to File or Directory > " + Fore.RESET)
                     case [a, b, c] if a is None and not (b is None or c is None):
                         user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm > " + Fore.RESET)
 
@@ -305,7 +305,7 @@ def stand_alone(single_run=False):
                         hash_2 = user
                     else:
                         tries -= 1
-                        print(Fore.BLUE + f"\tYou've already supplied two objects. ({Fore.LIGHTYELLOW_EX}{tries}{Fore.BLUE} tries remain)")
+                        print(Fore.BLUE + f"\tYou've already supplied two hash objects. ({Fore.LIGHTYELLOW_EX}{tries}{Fore.BLUE} tries remain)")
                 if hash_strings >= 2:
                     method = "STRINGS" # no need for algorithm
                     break
