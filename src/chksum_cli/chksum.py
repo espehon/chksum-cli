@@ -26,7 +26,7 @@ class StandaloneMode(argparse.Action):
         parser.exit(stand_alone(single_run=True))
 
 
-CHKSUM_LICENSE = """Copyright (c) 2022, espehon\n  License: https://www.gnu.org/licenses/gpl-3.0.html"""
+CHKSUM_LICENSE = """  Copyright (c) 2022, espehon\n  License: https://www.gnu.org/licenses/gpl-3.0.html"""
 
 ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 
@@ -123,6 +123,7 @@ def get_hash(path: str, is_directory: bool=False) -> str:
     return checksum.get_for_file(path, hash_mode=method)
 
 def yield_license_once() -> str:
+    """Generator function for return CHKSUM_LICENSE once"""
     first_run = True
     while True:
         if first_run:
@@ -243,7 +244,11 @@ def stand_alone(single_run=False):
         6. Test, format, and output hashes
         7. Ask to rerun
     """
-    title = fr"""
+    user = ""                                   # for storing user input
+    program_is_running = True                   # for controlling the following while loop
+    CWD = os.getcwd()                           # current working directory
+    license_generator = yield_license_once()    # generator for printing license on first loop only
+    TITLE = fr"""
 
 
       _     _                        
@@ -251,17 +256,14 @@ def stand_alone(single_run=False):
   ___| |__ | | _____ _   _ _ __ ___  
  / __| '_ \| |/ / __| | | | '_ ` _ \ 
 | (__| | | |   <\__ \ |_| | | | | | |
- \___|_| |_|_|\_\___/\__,_|_| |_| |_|
-{print(yield_license_once())}
-
-{ALGORITHMS = }
-"""
-    user = ""                   # for storing user input
-    program_is_running = True   # for controlling the following while loop
+ \___|_| |_|_|\_\___/\__,_|_| |_| |_|"""
 
     while program_is_running:
         try:
-            print(title)
+            print(f"{Fore.LIGHTBLUE_EX}{TITLE}")
+            print(f"{Fore.LIGHTBLUE_EX}{next(license_generator)}")
+            print(f"{Fore.LIGHTBLUE_EX}\n{ALGORITHMS = }")
+            print(f"{Fore.LIGHTBLUE_EX}Called at " + CWD + "\n")
 
             method = None
             hash_1 = None
@@ -274,27 +276,27 @@ def stand_alone(single_run=False):
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
                     case [a, b, c] if a is None and (b is None or c is None):
-                        user = input("Enter Algorithm or path to File or Directory > ")
+                        user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm or path to File or Directory > " + Fore.RESET)
                     case [a, b, c] if a is not None and (b is None or c is None):
-                        user = input("Enter path to File or Directory > ")
+                        user = input(Fore.LIGHTBLUE_EX + "Enter path to File or Directory > " + Fore.RESET)
                     case [a, b, c] if a is None and not (b is None or c is None):
-                        user = input("Enter Algorithm > ")
+                        user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm > " + Fore.RESET)
 
                 if user.strip() == "":
                     tries -= 1
-                    print("\tNothing was entered; please try again.")
+                    print(f"\t{Fore.BLUE}Nothing was entered; please try again. ({Fore.LIGHTYELLOW_EX}{tries}{Fore.BLUE} tries remain)")
                 elif str.lower(user) in ALGORITHMS:
                     method = str.lower(user)
-                    print("\tAlgorithm entered.")
+                    print(Fore.BLUE + "\tAlgorithm entered.")
                 else:
                     if '~' in user:
                         user = get_full_path(user)
                     if os.path.isfile(user):
-                        print("\tFile entered.")
+                        print(Fore.BLUE + "\tFile entered.")
                     elif os.path.exists(user):
-                        print("\tDirectory entered.")
+                        print(Fore.BLUE + "\tDirectory entered.")
                     else:
-                        print("\tHash string entered.")
+                        print(Fore.BLUE + "\tHash string entered.")
                         if hash_1 is None or hash_2 is None:
                             hash_strings += 1
                     if hash_1 is None:
@@ -302,13 +304,13 @@ def stand_alone(single_run=False):
                     elif hash_2 is None:
                         hash_2 = user
                     else:
-                        print("\tYou've already supplied two objects...")
                         tries -= 1
+                        print(Fore.BLUE + f"\tYou've already supplied two objects. ({Fore.LIGHTYELLOW_EX}{tries}{Fore.BLUE} tries remain)")
                 if hash_strings >= 2:
                     method = "STRINGS" # no need for algorithm
                     break
                 if tries <= 0:
-                    print(Fore.YELLOW + "\tNumber of tries exceeded!")
+                    print(Fore.LIGHTYELLOW_EX + "\tNumber of tries exceeded!")
                     raise UserWarning
 
             for index, thing in enumerate([hash_1, hash_2]):
@@ -319,8 +321,8 @@ def stand_alone(single_run=False):
                         hash_2 = checksum.get_for_file(thing, hash_mode=method)
                 elif os.path.exists(thing):
                     if include_dots is None:
-                        include_dots = str.lower(input("Do you want to include '.' (dot) files? [Y/n] > ")).strip() != 'n'
-                        print(f"{include_dots = }")
+                        include_dots = str.lower(input(Fore.LIGHTBLUE_EX + "Do you want to include '.' (dot) files? [Y/n] > " + Fore.RESET)).strip() != 'n'
+                        print(Fore.BLUE + f"\t{include_dots = }")
                     if index == 0:
                         hash_1 = checksum.get_for_directory(thing, hash_mode=method,
                         filter_dots= not include_dots)
@@ -341,18 +343,18 @@ def stand_alone(single_run=False):
             # else (if not in single mode) continue though loop
 
         except KeyboardInterrupt:
-            print(Fore.YELLOW + "Keyboard Interrupt!")
+            print(Fore.LIGHTYELLOW_EX + "Keyboard Interrupt!")
         except UserWarning:
-            print("\tProgress stopped...")
+            print(f"{Fore.BLUE}\tProgress stopped...")
         except PermissionError:
             print(Fore.LIGHTRED_EX + "Permission Denied.")
 
         program_is_running = False
         if single_run is False:
             try:    # Incase the user mashes keyboard interrupt
-                user = str.lower(input("\nEnter R to rerun. Anything else will exit. > "))
+                user = str.lower(input(f"{Fore.LIGHTBLUE_EX}\nEnter R to rerun. Anything else will exit. > "))
                 if user == 'r':
                     program_is_running = True
                     print('\n' * 3)
             except KeyboardInterrupt:
-                print(Fore.YELLOW + "Exiting program...")
+                print(Fore.LIGHTYELLOW_EX + "Exiting program...")
