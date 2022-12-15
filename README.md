@@ -69,7 +69,7 @@ Enter Algorithm or path to File or Directory > ./
 Enter Algorithm > md5
         Algorithm entered.
 Do you want to include '.' (dot) files? [Y/n] > n
-include_dots = False
+        include_dots = False
 
 -------------[MD5]--------------
 59198d6aad1674a0b372027ce275a9b6
