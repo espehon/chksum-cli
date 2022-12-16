@@ -272,31 +272,37 @@ def stand_alone(single_run=False):
             include_dots = None
             tries = 3
             hash_strings = 0
+            interactive_colors = {
+                'prompt': Fore.LIGHTBLUE_EX,
+                'output': Fore.BLUE,
+                'input': Fore.WHITE,
+                'warn': Fore.LIGHTYELLOW_EX
+            }
 
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
                     case [a, b, c] if a is None and (b is None or c is None):
-                        user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm or Path to File or Directory > " + Fore.RESET)
+                        user = input(interactive_colors['prompt'] + "Enter Algorithm or Path to File or Directory > " + interactive_colors['input'])
                     case [a, b, c] if a is not None and (b is None or c is None):
-                        user = input(Fore.LIGHTBLUE_EX + "Enter Path to File or Directory > " + Fore.RESET)
+                        user = input(interactive_colors['prompt'] + "Enter Path to File or Directory > " + interactive_colors['input'])
                     case [a, b, c] if a is None and not (b is None or c is None):
-                        user = input(Fore.LIGHTBLUE_EX + "Enter Algorithm > " + Fore.RESET)
+                        user = input(interactive_colors['prompt'] + "Enter Algorithm > " + interactive_colors['input'])
 
                 if user.strip() == "":
                     tries -= 1
-                    print(f"\t{Fore.BLUE}Nothing was entered; please try again. ({Fore.LIGHTYELLOW_EX}{tries}{Fore.BLUE} tries remain)")
+                    print(f"\t{interactive_colors['output']}Nothing was entered; please try again. ({interactive_colors['warn']}{tries}{Fore.BLUE} tries remain)")
                 elif str.lower(user) in ALGORITHMS:
                     method = str.lower(user)
-                    print(Fore.BLUE + "\tAlgorithm entered.")
+                    print(interactive_colors['output'] + "\tAlgorithm entered.")
                 else:
                     if '~' in user:
                         user = get_full_path(user)
                     if os.path.isfile(user):
-                        print(Fore.BLUE + "\tFile entered.")
+                        print(interactive_colors['output'] + "\tFile entered.")
                     elif os.path.exists(user):
-                        print(Fore.BLUE + "\tDirectory entered.")
+                        print(interactive_colors['output'] + "\tDirectory entered.")
                     else:
-                        print(Fore.BLUE + "\tHash string entered.")
+                        print(interactive_colors['output'] + "\tHash string entered.")
                         if hash_1 is None or hash_2 is None:
                             hash_strings += 1
                     if hash_1 is None:
@@ -305,12 +311,12 @@ def stand_alone(single_run=False):
                         hash_2 = user
                     else:
                         tries -= 1
-                        print(Fore.BLUE + f"\tYou've already supplied two hash objects. ({Fore.LIGHTYELLOW_EX}{tries}{Fore.BLUE} tries remain)")
+                        print(interactive_colors['output'] + f"\tYou've already supplied two hash objects. ({interactive_colors['warn']}{tries}{interactive_colors['output']} tries remain)")
                 if hash_strings >= 2:
                     method = "STRINGS" # no need for algorithm
                     break
                 if tries <= 0:
-                    print(Fore.LIGHTYELLOW_EX + "\tNumber of tries exceeded!")
+                    print(interactive_colors['warn'] + "\tNumber of tries exceeded!")
                     raise UserWarning
 
             for index, thing in enumerate([hash_1, hash_2]):
@@ -321,8 +327,8 @@ def stand_alone(single_run=False):
                         hash_2 = checksum.get_for_file(thing, hash_mode=method)
                 elif os.path.exists(thing):
                     if include_dots is None:
-                        include_dots = str.lower(input(Fore.LIGHTBLUE_EX + "Do you want to include '.' (dot) files? [Y/n] > " + Fore.RESET)).strip() != 'n'
-                        print(Fore.BLUE + f"\t{include_dots = }")
+                        include_dots = str.lower(input(Fore.LIGHTBLUE_EX + "Do you want to include '.' (dot) files? [Y/n] > " + interactive_colors['input'])).strip() != 'n'
+                        print(interactive_colors['output'] + f"\t{include_dots = }")
                     if index == 0:
                         hash_1 = checksum.get_for_directory(thing, hash_mode=method,
                         filter_dots= not include_dots)
