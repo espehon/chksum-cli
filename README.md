@@ -15,6 +15,15 @@ pip install chksum-cli
 ```
 
 
+# Features
+- User friendly non-specific argument order
+- Visual feedback comparing hashes
+- Exit code matches hash results
+- Can ignore dot files
+- Interactive mode
+- Can use md5, sha1, sha256, and sha512
+
+
 # Usage
 ```
 CHKSUM [-?] [-i] [-d] position1 position2 [position3]
