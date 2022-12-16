@@ -35,7 +35,7 @@ options:
 
 If the first 2 positional arguments are strings, the algorithm is not needed. Default is md5.
 ```
-Arguments can be passed in any order. [[note](#issues)]\
+Arguments can be passed in any order. [Note: [This issue](#issues)]\
 E.g. the following are equivalent:\
 `chksum <PathToFile> <PathToDir> sha256 -d`\
 `chksum -d <PathToDir> sha256 <PathToFile>`
