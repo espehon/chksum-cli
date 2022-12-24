@@ -33,6 +33,13 @@ ALGORITHMS = ['md5', 'sha1', 'sha256', 'sha512']
 positionals = {}    # for storing positionals their type
 method = 'md5'      # algorithm to be used. Currently set as default (not a constant)
 
+interactive_colors = {      # colors used in the interactive mode
+                'prompt': Fore.LIGHTBLUE_EX,
+                'output': Fore.BLUE,
+                'input': Fore.LIGHTWHITE_EX,
+                'warn': Fore.LIGHTYELLOW_EX
+            }
+
 parser = argparse.ArgumentParser(
     prog="CHKSUM",
     description = (f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \n{ALGORITHMS = }"),
@@ -272,12 +279,7 @@ def stand_alone(single_run=False):
             include_dots = None
             tries = 3
             hash_strings = 0
-            interactive_colors = {
-                'prompt': Fore.LIGHTBLUE_EX,
-                'output': Fore.BLUE,
-                'input': Fore.WHITE,
-                'warn': Fore.LIGHTYELLOW_EX
-            }
+            
 
             while method is None or hash_1 is None or hash_2 is None:
                 match [method, hash_1, hash_2]:
@@ -327,7 +329,7 @@ def stand_alone(single_run=False):
                         hash_2 = checksum.get_for_file(thing, hash_mode=method)
                 elif os.path.exists(thing):
                     if include_dots is None:
-                        include_dots = str.lower(input(Fore.LIGHTBLUE_EX + "Do you want to include '.' (dot) files? [Y/n] > " + interactive_colors['input'])).strip() != 'n'
+                        include_dots = str.lower(input(interactive_colors['prompt'] + "Do you want to include '.' (dot) files? [Y/n] > " + interactive_colors['input'])).strip() != 'n'
                         print(interactive_colors['output'] + f"\t{include_dots = }")
                     if index == 0:
                         hash_1 = checksum.get_for_directory(thing, hash_mode=method,
@@ -349,18 +351,18 @@ def stand_alone(single_run=False):
             # else (if not in single mode) continue though loop
 
         except KeyboardInterrupt:
-            print(Fore.LIGHTYELLOW_EX + "Keyboard Interrupt!")
+            print(interactive_colors['warn'] + "Keyboard Interrupt!")
         except UserWarning:
-            print(f"{Fore.BLUE}\tProgress stopped...")
+            print(interactive_colors['output'] + "\tProgress stopped...")
         except PermissionError:
-            print(Fore.LIGHTRED_EX + "Permission Denied.")
+            print(Fore.LIGHTRED_EX + "Permission Denied.")  # this should always be light red
 
         program_is_running = False
         if single_run is False:
             try:    # Incase the user mashes keyboard interrupt
-                user = str.lower(input(f"{Fore.LIGHTBLUE_EX}\nEnter R to rerun. Anything else will exit. > "))
+                user = str.lower(input(f"{interactive_colors['prompt']}\nEnter R to rerun. Anything else will exit. > "))
                 if user == 'r':
                     program_is_running = True
                     print('\n' * 3)
             except KeyboardInterrupt:
-                print(Fore.LIGHTYELLOW_EX + "Exiting program...")
+                print(interactive_colors['warn'] + "Exiting program...")
