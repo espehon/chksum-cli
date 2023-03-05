@@ -193,8 +193,11 @@ def compare_hashes(hash_1: str, hash_2: str, title: str):
 
 
 def cli(argv=None):
-    """Processes the command line arguments and outputs accordingly.
-    This is the main logic for the program when ran as one line (not in interactive mode)"""
+    """
+    Processes the command line arguments and outputs accordingly.
+    This is the main logic for the program when ran as one line (not in interactive mode)
+    """
+    
     global method
     global args
     args = parser.parse_args(argv)              # get args from input
@@ -240,7 +243,8 @@ def cli(argv=None):
     
 
 def stand_alone(single_run=False):
-    """ Interactive mode
+    """ 
+    Interactive mode
     This is the standalone version.
     Logic works as follows:
         1. Get 1 of 3 options from user
