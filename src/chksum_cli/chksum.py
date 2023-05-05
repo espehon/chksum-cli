@@ -271,10 +271,10 @@ def stand_alone(single_run=False):
 
     while program_is_running:
         try:
-            print(f"{Fore.LIGHTBLUE_EX}{TITLE}")
-            print(f"{Fore.LIGHTBLUE_EX}{next(license_generator)}")
-            print(f"{Fore.LIGHTBLUE_EX}\n{ALGORITHMS = }")
-            print(f"{Fore.LIGHTBLUE_EX}Called at " + CWD + "\n")
+            print(f"{interactive_colors['output']}{TITLE}")
+            print(f"{interactive_colors['output']}{next(license_generator)}")
+            print(f"{interactive_colors['output']}\n{ALGORITHMS = }")
+            print(f"{interactive_colors['output']}Called at " + CWD + "\n")
 
             method = None
             hash_1 = None
