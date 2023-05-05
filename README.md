@@ -21,6 +21,7 @@ pip install chksum-cli
 - Exit code matches hash results
 - Can ignore dot files
 - Interactive mode
+- Hash only function
 - Can use md5, sha1, sha256, and sha512
 
 
@@ -43,6 +44,7 @@ options:
   -d, --dots         Ignore '.' (dot) files from directories.
 
 If the first 2 positional arguments are strings, the algorithm is not needed. Default is md5.
+Likewise, passing only a single path will simply out the digest.
 ```
 Arguments can be passed in any order. [Note: [This issue](#issues)]\
 E.g. the following are equivalent:\
@@ -88,7 +90,7 @@ Do you want to include '.' (dot) files? [Y/n] > n
 
 
 # <a name="issues"></a>Issues
-Using `-d` in between second and third positional causes an argparse error. (See Issue: [#11](https://github.com/espehon/chksum-cli/issues/11))\
+Using `-d` in between positionals can causes an argparse error. (See Issue: [#11](https://github.com/espehon/chksum-cli/issues/11))\
 Example:\
         `$ chksum ./file ./file -d sha1`
 
