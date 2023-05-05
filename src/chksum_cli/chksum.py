@@ -75,6 +75,7 @@ parser.add_argument('position1',
 )
 parser.add_argument('position2',
                     type=str,
+                    nargs='?',
                     help="Checksum, file, or algorithm"
 )
 parser.add_argument('position3',
@@ -191,6 +192,12 @@ def compare_hashes(hash_1: str, hash_2: str, title: str):
         print(Fore.LIGHTRED_EX + "X Hashes Do Not Match\n")
         return False
 
+def output_single_hash(path: str, is_directory: bool=False):
+    hash = get_hash(path, is_directory)
+    title = str.upper("[" + method + "]").center(len(hash), '-')
+    print(title)
+    print(hash)
+
 
 def cli(argv=None):
     """
@@ -203,13 +210,19 @@ def cli(argv=None):
     args = parser.parse_args(argv)              # get args from input
 
     process_positional(args.position1, 1)   # store positional accordingly
-    process_positional(args.position2, 2)   # store positional accordingly
+
     try:
+        process_positional(args.position2, 2)    # store positional accordingly (optional if user wants to know a hash)
         process_positional(args.position3, 3)    # store optional 3rd positional
     except TypeError:
-        # There was no third positional
+        # There was no third positional and maybe no 2nd
         pass
-    if len(positionals) < 2:    # must have at least 2 positionals
+
+    if len(positionals) < 2:    # check if single hash mode or possible missing args
+        for position in positionals:
+            if positionals[position]['type'] == 'file' or positionals[position]['type'] == 'dir':
+                output_single_hash(positionals[position]['value'], positionals[position]['type'] == 'dir')
+                return 0
         return "Missing positional argument..."
 
     hashes = []                 # stores the final hashes for output
