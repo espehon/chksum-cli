@@ -44,7 +44,7 @@ parser = argparse.ArgumentParser(
     prog="CHKSUM",
     description = (f"Calculate and compare the checksums of files or directories.\nCan also compare against pasted strings. \n{ALGORITHMS = }"),
     formatter_class=argparse.RawDescriptionHelpFormatter,
-    epilog = (f"If the first 2 positional arguments are strings, the algorithm is not needed. Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF\nLikewise, passing only a single path will simply out the digest."),
+    epilog = (f"If the first 2 positional arguments are strings, the algorithm is not needed. Default is {method}.\n\tExample 1: chksum ./file1 ./file2 sha512\n\tExample 2: chksum 123456789ABCDEF 123456789ABCDEF\n\tExample 3: chksum ./dir 123456789ABCDEF\nLikewise, passing only a single path will simply output the digest."),
     add_help = False # free -h from help (-? will be used as help flag)
 )
 parser.add_argument('-?',
